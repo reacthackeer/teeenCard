@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
     import { useToast } from '@chakra-ui/react';
+import _ from 'lodash';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { updateUserAuthInfo } from '../../App/features/auth/authSlice';
@@ -14,6 +15,7 @@ import { useApplyCouponMutation } from '../../App/features/coupon/api';
     const [amount, setAmount] = useState('');
     const [email, setEmail] = useState('');
     const [userId, setUserId] = useState('empty');
+    const [debounceLoading, setDebounceLoading] = useState(false);
     const [balanceType, setBalanceType] = useState('');
     const {userId:adminId, referralCode, email: adminEmail} = useSelector((state)=> state.auth.auth);
 
@@ -22,6 +24,7 @@ import { useApplyCouponMutation } from '../../App/features/coupon/api';
     const [provideCouponInfo, {data, isLoading, isError, isSuccess, error}] = useApplyCouponMutation();
     const handleSubmit = (event) => {
         event.preventDefault();
+        setDebounceLoading(()=> false);
         if(couponCode && amount && email && balanceType && adminId && userId && adminEmail){
         if(balanceType === 'DEMO' || balanceType === 'REAL' || balanceType === 'OFFLINE'){
             let postData = {
@@ -52,6 +55,14 @@ import { useApplyCouponMutation } from '../../App/features/coupon/api';
         })
         }
     };
+
+    const couponDebounce =_.debounce(handleSubmit, 1000)
+
+    const handleSubmitFirst = (e) => {
+        e.preventDefault();
+        setDebounceLoading(()=> true);
+        couponDebounce(e);
+    }
     const navigate = useNavigate();
     useEffect(()=>{   
         if(!isLoading && isSuccess && !isError){
@@ -90,7 +101,7 @@ import { useApplyCouponMutation } from '../../App/features/coupon/api';
     
     return (
         <Box bg="white"> 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmitFirst}>
             <FormControl mb={3}>
             <FormLabel>Coupon Code</FormLabel>
             <Input
@@ -141,8 +152,12 @@ import { useApplyCouponMutation } from '../../App/features/coupon/api';
                 required
             />
             </FormControl>
-            <Button type="submit" colorScheme="blue">
-            Apply Coupon
+            <Button 
+                type="submit" 
+                colorScheme="blue"
+                isLoading={isLoading || debounceLoading}
+            >
+                Apply Coupon
             </Button>
         </form>
         </Box>

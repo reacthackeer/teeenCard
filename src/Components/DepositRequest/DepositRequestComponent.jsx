@@ -1,40 +1,73 @@
 import { Box, Button, HStack, Heading, Text, VStack } from '@chakra-ui/react';
+import _ from 'lodash';
 import moment from 'moment';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserAuthInfo } from '../../App/features/auth/authSlice';
 import { useBlockSingleDepositRequestMutation, useConfirmSingleDepositRequestMutation, useDeleteSingleDepositRequestMutation } from '../../App/features/depositRequest/api';
 const DepositRequestComponent = () => {
     let data = useSelector((state)=> state.depositRequest.data); 
     let adminId = useSelector((state)=> state.auth.auth.userId);
-
+    
+    const [debounceConfirmLoading, setDebounceConfirmLoading] = useState(false);
+    const [debounceBlockLoading, setDebounceBlockLoading] = useState(false);
+    const [debounceCancelLoading, setDebounceCancelLoading] = useState(false);
+    const [cancelId, setCancelId] = useState('');
+    const [confirmId, setConfirmId] = useState('');
+    const [blockId, setBlockId] = useState('');
     const dispatch = useDispatch();
 
-    const [provideCancelId] = useDeleteSingleDepositRequestMutation();
-    const [provideBlockId] = useBlockSingleDepositRequestMutation();
-    let [provideConfirmIdAndUserId,{data:confirmData, isSuccess}] = useConfirmSingleDepositRequestMutation();
+    
+    const [provideCancelId, {isLoading: cancelIsLoading}] = useDeleteSingleDepositRequestMutation();
+    const [provideBlockId, {isLoading: blockIsLoading}] = useBlockSingleDepositRequestMutation();
+    let [provideConfirmIdAndUserId,{data:confirmData, isSuccess, isLoading: confirmIsLoading}] = useConfirmSingleDepositRequestMutation();
     
     const handleCancelSingleRequest = (id) => {
-        let result = window.confirm('Are you sure to cancel this request?');
-        if(id && result){
+            setDebounceCancelLoading(()=> false);
             provideCancelId({id});
-        }
     };
 
     const handleBlockSingleRequest = (id, userId) => {
-        let result = window.confirm('Are you sure to block this user?');
-        if(id && result && userId){
+            setDebounceBlockLoading(()=> false);
             provideBlockId({id, userId});
-        }
     };
     
     const handleConfirmSingleRequest = (id, userId) => {
-        let result = window.confirm('Are you sure to confirm this request?');
-        if(id && result && userId){
+            setDebounceConfirmLoading(()=> false);
             provideConfirmIdAndUserId({id, userId});
+    };
+
+    const confirmDebounce = _.debounce(handleConfirmSingleRequest, 1000);
+    const blockDebounce = _.debounce(handleBlockSingleRequest, 1000);
+    const cancelDebounce = _.debounce(handleCancelSingleRequest, 1000);
+
+    const handleCancelSingleRequestFirst = (id) => {
+        let result = window.confirm('Are you sure to cancel this request?');
+        if(id && result){ 
+            setCancelId(()=> id);
+            setDebounceCancelLoading(()=> true);
+            cancelDebounce(id);
+        }
+    };
+
+    const handleBlockSingleRequestFirst = (id, userId) => {
+        let result = window.confirm('Are you sure to block this user?');
+        if(id && result && userId){
+            setBlockId(()=> id);
+            setDebounceBlockLoading(()=> true)
+            blockDebounce(id, userId)
         }
     };
     
+    const handleConfirmSingleRequestFirst = (id, userId) => {
+        let result = window.confirm('Are you sure to confirm this request?');
+        if(id && result && userId){
+            setConfirmId(()=> id);
+            setDebounceConfirmLoading(()=> true);
+            confirmDebounce(id, userId);
+        }
+    };
+
     useEffect(()=>{
         if(isSuccess && confirmData && confirmData?.userId === adminId){
             dispatch(updateUserAuthInfo({auth: confirmData}))
@@ -62,24 +95,27 @@ const DepositRequestComponent = () => {
                                 <Button width={'100px'}>{info.amount}</Button>
                             </HStack>
                             <HStack>
-                                <Button width={'160px'}>{info.idType}</Button>
-                                <Button width={'100px'}>{result}</Button> 
-                                <Button 
-                                    width={'100px'} 
-                                    colorScheme='orange'
-                                    onClick={()=> handleCancelSingleRequest(info.id)}
-                                >Cancel</Button>
+                                <Button>{info.idType}</Button>
+                                <Button>{result}</Button> 
                             </HStack> 
                             <HStack>
-                                <Button 
-                                    width={'160px'}
+                                <Button  
+                                    colorScheme='orange'
+                                    onClick={()=> handleCancelSingleRequestFirst(info.id)}
+                                    size={'sm'}
+                                    isLoading={cancelId === info.id && cancelIsLoading || cancelId === info.id && debounceCancelLoading}
+                                >Cancel</Button>
+                                <Button  
                                     colorScheme='red' 
-                                    onClick={()=> handleBlockSingleRequest(info.id, info.userId)}
+                                    onClick={()=> handleBlockSingleRequestFirst(info.id, info.userId)}
+                                    size={'sm'}
+                                    isLoading={blockId === info.id && blockIsLoading || debounceBlockLoading && blockId === info.id}
                                 >BLOCK</Button> 
-                                <Button
-                                    width={'160px'} 
+                                <Button 
                                     colorScheme='green'
-                                    onClick={()=> handleConfirmSingleRequest(info.id, info.userId)}
+                                    onClick={()=> handleConfirmSingleRequestFirst(info.id, info.userId)}
+                                    size={'sm'}
+                                    isLoading={confirmId === info.id && confirmIsLoading || confirmId === info.id && debounceConfirmLoading}
                                 >Confirm</Button> 
                             </HStack>
                         </VStack>

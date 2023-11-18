@@ -1,9 +1,9 @@
 import { Box, Button, FormControl, FormLabel, HStack, Input, Select, Text, VStack, useToast } from '@chakra-ui/react';
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAddSingleDepositRequestMutation } from '../../App/features/depositRequest/api';
 import { useGetAllWalletQuery } from '../../App/features/wallet/api';
-
 
 const DepositByWallet = () => {
         let {data, isSuccess} = useGetAllWalletQuery(); 
@@ -12,6 +12,7 @@ const DepositByWallet = () => {
         const [reference, setReference] = useState('');
         const authInfo = useSelector((state)=> state.auth.auth);
         const [amount, setAmount] = useState('');
+        const [debounceLoading, setDebounceLoading] = useState(false);
 
         const toast = useToast();
         
@@ -62,6 +63,7 @@ const DepositByWallet = () => {
 
         const handleSubmit = (e) => {
             e.preventDefault(); 
+            setDebounceLoading(()=> false);
             let postInfo = {
                 wallet: selectedWallet,
                 idType: selectedIdType,
@@ -73,10 +75,7 @@ const DepositByWallet = () => {
             };   
             let {wallet,idType, account, currency, amount: pAmount, referrance, userId} = postInfo;
             if(wallet && idType && account && currency && pAmount && referrance && userId){
-                let result = window.confirm('If you not send money and submit deposit request then your account will be permanently disabled and your are going to jail room and you cannot access your account and your all amount will be freeze. You agree my condition?');
-                if(result){
-                    provideDepositRequestInfo(postInfo);
-                }
+                provideDepositRequestInfo(postInfo);
             }else{
                 toast({
                     title: 'Invalid post request!',
@@ -87,6 +86,18 @@ const DepositByWallet = () => {
             }
         };
 
+        const depositWalletDebounce = _.debounce(handleSubmit, 1000);
+
+        const handleSubmitFirst = (e) => {
+            e.preventDefault();
+            setDebounceLoading(()=> true);
+            let result = window.confirm('If you not send money and submit deposit request then your account will be permanently disabled and your are going to jail room and you cannot access your account and your all amount will be freeze. You agree my condition?');
+            if(result){
+                depositWalletDebounce(e);
+            }else{
+                setDebounceLoading(()=> false);
+            }
+        }
         useEffect(()=>{  
             if(!drIsLoading && drIsSuccess && !drIsError){
                 if(drData && drData?.id > 0){ 
@@ -126,7 +137,7 @@ const DepositByWallet = () => {
         <Box>
             <strong>Current Balance:</strong> R/$ {authInfo.realBalance} - O/$ ${authInfo.offlineBalance} - D/$ ${authInfo.demoBalance}
         </Box>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmitFirst}>
 
             {isSuccess&& data && data?.length > 0 && <FormControl mt='2'>
                 <FormLabel>Select your wallet type:</FormLabel>
@@ -169,7 +180,7 @@ const DepositByWallet = () => {
                 <Button 
                     type="submit" 
                     colorScheme="blue"
-                    isLoading={drIsLoading}
+                    isLoading={drIsLoading || debounceLoading}
                 >Submit Deposit Request</Button> 
             </HStack>
         </form>

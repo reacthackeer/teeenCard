@@ -1,0 +1,293 @@
+let lesson1 = [
+    {
+        "No": "1",
+        "Vocabulary": "わたし",
+        "Kanji": "",
+        "Meaning": "I"
+    },
+    {
+        "No": "2",
+        "Vocabulary": "わたしたち",
+        "Kanji": "",
+        "Meaning": "we"
+    },
+    {
+        "No": "3",
+        "Vocabulary": "あなた",
+        "Kanji": "",
+        "Meaning": "friend, you"
+    },
+    {
+        "No": "4",
+        "Vocabulary": "あのひと",
+        "Kanji": "あの人",
+        "Meaning": "that person"
+    },
+    {
+        "No": "5",
+        "Vocabulary": "あのかた",
+        "Kanji": "あの方",
+        "Meaning": "the other"
+    },
+    {
+        "No": "6",
+        "Vocabulary": "みなさん",
+        "Kanji": "皆さん",
+        "Meaning": "Guys, brothers, sisters, everyone"
+    },
+    {
+        "No": "7",
+        "Vocabulary": "ふじだいがく",
+        "Kanji": "富士大学",
+        "Meaning": "Fuji University"
+    },
+    {
+        "No": "8",
+        "Vocabulary": "～さん",
+        "Kanji": "",
+        "Meaning": "Mr. ～, Sister ～"
+    },
+    {
+        "No": "9",
+        "Vocabulary": "～ちゃん",
+        "Kanji": "",
+        "Meaning": "baby (for girls) or intimate call for kids (both boys and girls)"
+    },
+    {
+        "No": "10",
+        "Vocabulary": "～くん",
+        "Kanji": "～君",
+        "Meaning": "baby (for men) or intimate call"
+    },
+    {
+        "No": "11",
+        "Vocabulary": "～じん",
+        "Kanji": "～人",
+        "Meaning": "country people ～"
+    },
+    {
+        "No": "12",
+        "Vocabulary": "せんせい",
+        "Kanji": "先生",
+        "Meaning": "teacher"
+    },
+    {
+        "No": "13",
+        "Vocabulary": "きょうし",
+        "Kanji": "教師",
+        "Meaning": "teacher (refers to career)"
+    },
+    {
+        "No": "14",
+        "Vocabulary": "がくせい",
+        "Kanji": "学生",
+        "Meaning": "student"
+    },
+    {
+        "No": "15",
+        "Vocabulary": "かいしゃいん",
+        "Kanji": "会社員",
+        "Meaning": "employee"
+    },
+    {
+        "No": "16",
+        "Vocabulary": "～しゃいん",
+        "Kanji": "社員",
+        "Meaning": "nhân company employees"
+    },
+    {
+        "No": "17",
+        "Vocabulary": "ぎんこういん",
+        "Kanji": "銀行員",
+        "Meaning": "teller"
+    },
+    {
+        "No": "18",
+        "Vocabulary": "いしゃ",
+        "Kanji": "医者",
+        "Meaning": "doctor"
+    },
+    {
+        "No": "19",
+        "Vocabulary": "けんきゅうしゃ",
+        "Kanji": "研究者",
+        "Meaning": "postgraduate"
+    },
+    {
+        "No": "20",
+        "Vocabulary": "エンジニア",
+        "Kanji": "",
+        "Meaning": "engineer"
+    },
+    {
+        "No": "21",
+        "Vocabulary": "だいがく",
+        "Kanji": "大学",
+        "Meaning": "University"
+    },
+    {
+        "No": "22",
+        "Vocabulary": "びょういん",
+        "Kanji": "病院",
+        "Meaning": "hospital"
+    },
+    {
+        "No": "23",
+        "Vocabulary": "でんき",
+        "Kanji": "電気",
+        "Meaning": "electricity"
+    },
+    {
+        "No": "24",
+        "Vocabulary": "だれ",
+        "Kanji": "",
+        "Meaning": "who (ask someone)"
+    },
+    {
+        "No": "25",
+        "Vocabulary": "どなた",
+        "Kanji": "",
+        "Meaning": "Sir, who (same meaning but more polite)"
+    },
+    {
+        "No": "26",
+        "Vocabulary": "～さい",
+        "Kanji": "－歳",
+        "Meaning": "～ years old"
+    },
+    {
+        "No": "27",
+        "Vocabulary": "なんさい",
+        "Kanji": "何歳",
+        "Meaning": "how old are you?"
+    },
+    {
+        "No": "28",
+        "Vocabulary": "おいくつ",
+        "Kanji": "",
+        "Meaning": "how old (use politeness)"
+    },
+    {
+        "No": "29",
+        "Vocabulary": "はい",
+        "Kanji": "",
+        "Meaning": "Yes"
+    },
+    {
+        "No": "30",
+        "Vocabulary": "いいえ",
+        "Kanji": "",
+        "Meaning": "is not"
+    },
+    {
+        "No": "31",
+        "Vocabulary": "しつれいですが",
+        "Kanji": "失礼ですが",
+        "Meaning": "sorry (when you want to ask someone something)"
+    },
+    {
+        "No": "32",
+        "Vocabulary": "おなまえは？",
+        "Kanji": "お名前は？",
+        "Meaning": "what is your name?"
+    },
+    {
+        "No": "33",
+        "Vocabulary": "はじめまして",
+        "Kanji": "初めまして。",
+        "Meaning": "See you first time"
+    },
+    {
+        "No": "34",
+        "Vocabulary": "どうぞよろしくおねがいします",
+        "Kanji": "どうぞよろしく[お願いします]。",
+        "Meaning": "Nice to meet you"
+    },
+    {
+        "No": "35",
+        "Vocabulary": "こちらは～さんです",
+        "Kanji": "",
+        "Meaning": "This is Mr/Ms/…"
+    },
+    {
+        "No": "36",
+        "Vocabulary": "～からきました",
+        "Kanji": "",
+        "Meaning": "from ～"
+    },
+    {
+        "No": "37",
+        "Vocabulary": "アメリカ",
+        "Kanji": "",
+        "Meaning": "America"
+    },
+    {
+        "No": "38",
+        "Vocabulary": "イギリス",
+        "Kanji": "",
+        "Meaning": "Brother"
+    },
+    {
+        "No": "39",
+        "Vocabulary": "インド",
+        "Kanji": "",
+        "Meaning": "India"
+    },
+    {
+        "No": "40",
+        "Vocabulary": "インドネシア",
+        "Kanji": "",
+        "Meaning": "Indonesia"
+    },
+    {
+        "No": "41",
+        "Vocabulary": "かんこく",
+        "Kanji": "韓国",
+        "Meaning": "South Korea"
+    },
+    {
+        "No": "42",
+        "Vocabulary": "タイ",
+        "Kanji": "",
+        "Meaning": "Thailand"
+    },
+    {
+        "No": "43",
+        "Vocabulary": "ちゅうごく",
+        "Kanji": "中国",
+        "Meaning": "China"
+    },
+    {
+        "No": "44",
+        "Vocabulary": "ドイツ",
+        "Kanji": "",
+        "Meaning": "Virtue"
+    },
+    {
+        "No": "45",
+        "Vocabulary": "にほん",
+        "Kanji": "日本",
+        "Meaning": "Japan"
+    },
+    {
+        "No": "46",
+        "Vocabulary": "フランス",
+        "Kanji": "",
+        "Meaning": "France"
+    },
+    {
+        "No": "47",
+        "Vocabulary": "ブラジル",
+        "Kanji": "",
+        "Meaning": "Brazil"
+    },
+    {
+        "No": "48",
+        "Vocabulary": "さくらだいがく",
+        "Kanji": "さくら大学",
+        "Meaning": "Sakura University"
+    }
+]
+
+export { lesson1 };
+// BanglaMeaning and English romaji and form an example sentence from each object's vocabulary. The sentence will be constructed using Japanese hiragana and the sentence that will be constructed should be given Bengali meaning by adding different properties. For example, it should have romaji property.

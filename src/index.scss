@@ -1,0 +1,196 @@
+@import './variables';
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Rubik', sans-serif;
+    position: relative;
+}
+
+.body__view__upper__main__cover__container{
+    width: 100%;
+    height: 100vh;
+    flex-direction: column; 
+    @extend .d_f_j_c_a_c;
+
+    .body__view__main__container{ 
+        width: 100%;
+        height: 100%;
+        padding: 5px;
+        @extend .phone__custom__height; 
+        padding-bottom: 5px;
+        box-shadow: 0 0 4px grey;
+        overflow: scroll; 
+    }
+    .body__view__main__container::-webkit-scrollbar{
+        width: 0px;
+    }
+}
+
+.view__area__main__container{
+    position: relative;
+    padding-top: 40px;
+    
+
+    .RESET__AREA{ 
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        button{
+            width: 100%;
+        }
+    }
+
+    .data__view__main__container{
+        position: relative;
+        width: 100%;
+        padding-top: 5px;
+
+        .single__vocabulary__box{
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+            text-align: center; 
+            padding: 10px; 
+            margin-top: 3px;
+            border-radius: 4px;
+        }
+    }
+
+
+}
+
+.single__details__view__container{
+    position: relative;
+    top: -200%;
+    left: 0;
+    z-index: 3;
+    width: calc(100%);
+    height: fit-content;  
+    background-color: #c7fc83;
+    text-align: center;
+    padding: 30px 10px;
+    transition: all .3s;
+}
+
+.single__details__view__container.active{
+    top: 0;
+}
+
+.navigate__main__container{
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.loading__container{
+    
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+}
+
+.my__room__main__container{
+    position: relative;
+    width: calc(100% - 10px);
+    height: calc(100% - 30px);  
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;   
+    transition: all .3s; 
+}
+.my__room__main__container.active{
+    padding-bottom: 220px;
+}
+
+.my__playing__room__man__container{
+    position: relative; 
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+}
+.my__playing__room__man__container::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+}
+.my__room__element__container{
+    position: relative;  
+    overflow: hidden;
+    transition: all .3s;
+}
+.my__room__element__container.active{ 
+    padding-bottom: 300px;
+}
+
+.body__my__balanceView.active{
+    display: none;
+}
+
+.multiple___player__card__view__main__container{
+    position: relative;
+    background-color: red;
+    width: 100%;
+    height: 100%;
+}
+
+.all__player__single__card__view{
+    position: relative;
+    box-shadow: 0 0 3px grey;
+    padding: 20px;
+    
+    width: calc(100% - 30px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.my__card__image__1{
+    top: 0; 
+    left: 40px;
+}
+
+.my__card__image__2{
+    top: 0; 
+    left: 80px;
+}
+
+.three__card__view__container{
+    position: relative;
+    width: fit-content; 
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.my__room__component{
+    position: relative; 
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;   
+}
+
+.board__controller__main__container{ 
+    padding: 5px; 
+    position: absolute;
+    height: fit-content;
+    width: 200%;   
+    bottom: 0;
+    left: calc(-100% - 5px);
+    transition: all .3s;
+
+}
+.board__controller__main__container.active{
+    left: 2px;
+}

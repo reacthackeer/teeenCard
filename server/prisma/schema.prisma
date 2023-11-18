@@ -1,0 +1,244 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js" 
+  binaryTargets   = ["windows"]
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model board {
+  id                Int      @id @default(autoincrement())
+  roomId            String   @unique
+  name              String
+  join              Decimal
+  board             Decimal
+  chaal             Decimal
+  blind             Decimal
+  increase          String
+  compare           String
+  currentBalance    Decimal
+  currentCommission Decimal
+  totalBalance      Decimal
+  balanceType       String
+  accessIdes        Json
+  player            Json
+  playing           Json
+  member            Json
+  isStart           String   @default("false")
+  currentId         String   @default("empty")
+  previousId        String   @default("empty")
+  nextId            String   @default("empty")
+  adminId           String   @default("empty")
+  maxBlindHit       Int      @default(3)
+  maxChaalHit       Int      @default(3)
+  minBlindHit       Int      @default(0)
+  minChaalHit       Int      @default(0)
+  maxPlayer         Int      @default(17)
+  rootBlind         Decimal  @default(0)
+  rootChaal         Decimal  @default(0)
+  round             Int      @default(0)
+  type              String
+  isSchedule        String
+  startTime         DateTime @default(now())
+  cardViewTill      DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model inroom {
+  id         Int      @id @default(autoincrement())
+  userIdes   Json     @default("[]")
+  roomWithId Json     @default("[]")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model connectedlist {
+  id         Int      @id @default(autoincrement())
+  socketId   String   @unique
+  userId     String   @unique
+  roomId     String   @default("false")
+  inRoom     String   @default("false")
+  interested String   @default("false")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model wallet {
+  id        Int      @id @default(autoincrement())
+  currency  String
+  name      String   @unique
+  ides      Json
+  idesType  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model depositrequest {
+  id         Int      @id @default(autoincrement())
+  wallet     String
+  idType     String
+  account    String
+  currency   String
+  amount     Decimal
+  referrance String
+  userId     String
+  status     String   @default("pending")
+  message    String   @default("empty")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model currency {
+  id           Int      @id @default(autoincrement())
+  name         String
+  dollar       Decimal
+  currencyRate Decimal
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model coupon {
+  id          Int      @id @default(autoincrement())
+  isActive    String   @default("true")
+  status      String   @default("pending")
+  coupon      String   @unique
+  adminId     String
+  email       String
+  amount      Decimal
+  balanceType String
+  userId      String
+  message     String   @default("empty")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model rootasset {
+  id                                      Int      @id @default(autoincrement())
+  realRootBalance                         Decimal  @default(100000000000)
+  realCurrentBalance                      Decimal  @default(100000000000)
+  realTotalCouponDeposit                  Decimal  @default(0)
+  realTotalWalletDeposit                  Decimal  @default(0)
+  realTotalWalletWithdrawal               Decimal  @default(0)
+  realTotalCommission                     Decimal  @default(0)
+  realTotalAppCommission                  Decimal  @default(0)
+  realTotalPartnerCommission              Decimal  @default(0)
+  realTotalCouponWithdrawal               Decimal  @default(0)
+  realTotalCommissionWithdrawal           Decimal  @default(0)
+  realTotalAppCommissionWithdrawal        Decimal  @default(0)
+  realTotalPartnerCommissionWithdrawal    Decimal  @default(0)
+  demoRootBalance                         Decimal  @default(100000000000)
+  demoCurrentBalance                      Decimal  @default(100000000000)
+  demoTotalCouponDeposit                  Decimal  @default(0)
+  demoTotalWalletDeposit                  Decimal  @default(0)
+  demoTotalWalletWithdrawal               Decimal  @default(0)
+  demoTotalCommission                     Decimal  @default(0)
+  demoTotalAppCommission                  Decimal  @default(0)
+  demoTotalPartnerCommission              Decimal  @default(0)
+  demoTotalCouponWithdrawal               Decimal  @default(0)
+  demoTotalCommissionWithdrawal           Decimal  @default(0)
+  demoTotalAppCommissionWithdrawal        Decimal  @default(0)
+  demoTotalPartnerCommissionWithdrawal    Decimal  @default(0)
+  offlineRootBalance                      Decimal  @default(100000000000)
+  offlineCurrentBalance                   Decimal  @default(100000000000)
+  offlineTotalCouponDeposit               Decimal  @default(0)
+  offlineTotalWalletDeposit               Decimal  @default(0)
+  offlineTotalWalletWithdrawal            Decimal  @default(0)
+  offlineTotalCommission                  Decimal  @default(0)
+  offlineTotalAppCommission               Decimal  @default(0)
+  offlineTotalPartnerCommission           Decimal  @default(0)
+  offlineTotalCouponWithdrawal            Decimal  @default(0)
+  offlineTotalCommissionWithdrawal        Decimal  @default(0)
+  offlineTotalAppCommissionWithdrawal     Decimal  @default(0)
+  offlineTotalPartnerCommissionWithdrawal Decimal  @default(0)
+  createdAt                               DateTime @default(now())
+  updatedAt                               DateTime @updatedAt
+}
+
+model rootassettransaction {
+  id              Int      @id @default(autoincrement())
+  isIn            String   @default("false")
+  transactionType String
+  amount          Decimal
+  userId          String
+  balanceType     String
+  status          String   @default("pending")
+  message         String   @default("empty")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model backuppassword {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model transaction {
+  id          Int      @id @default(autoincrement())
+  isIn        String   @default("out")
+  amount      Decimal
+  txrId       String
+  typeName    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  sourceId    String   @default("empty")
+  balanceType String   @default("DEMO")
+  used        String   @default("false")
+}
+
+model user {
+  id             Int      @id @default(autoincrement())
+  name           String
+  email          String   @unique
+  phone          String   @unique
+  password       String
+  src            String   @default("empty")
+  inRoom         String   @default("false")
+  roomId         String   @default("false")
+  isDisabled     String   @default("false")
+  isJail         String   @default("false")
+  disabledTill   String   @default("false")
+  verify         String   @default("false")
+  role           String   @default("6")
+  accessCode     String   @default("empty")
+  designation    String   @default("user")
+  invitation     String   @default("Enable")
+  country        String   @default("empty")
+  currency       String   @default("empty")
+  referralCode   String
+  promoCode      String
+  realBalance    Decimal
+  demoBalance    Decimal
+  userId         String   @unique
+  myRef          String   @unique
+  offlineBalance Decimal
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model withdrawalrequest {
+  id         Int      @id @default(autoincrement())
+  wallet     String
+  idType     String
+  account    String
+  currency   String
+  amount     Decimal
+  referrance String
+  userId     String
+  status     String   @default("pending")
+  message    String   @default("empty")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

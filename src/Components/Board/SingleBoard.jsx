@@ -1,12 +1,17 @@
 import { Box, Button, Heading, Text, useToast } from '@chakra-ui/react';
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import Countdown from 'react-countdown';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteSingleBoardMutation, useJoinInRoomMutation, useLeaveInRoomMutation } from '../../App/features/board/api';
 
-const SingleBoard = ({info}) => {   
+const SingleBoard = ({info}) => {    
+
+    const [joinDebounceLoading, setJoinDebounceLoading] = useState(false);
+    const [leaveDebounceLoading, setLeaveDebounceLoading] = useState(false);
+    const [deleteDebounceLoading, setDeleteDebounceLoading] = useState(false);
+
     const toast = useToast();
     let userId = useSelector((state)=> state.auth.auth.userId);
     const navigate = useNavigate();
@@ -15,48 +20,56 @@ const SingleBoard = ({info}) => {
     const [provideInfo,{isLoading, isSuccess, data, isError}] = useDeleteSingleBoardMutation();
     const [provideJoinInfo,{isLoading: joinIsLoading, isSuccess: joinIsSuccess, isError: joinIsError, data: joinData}] = useJoinInRoomMutation();
     const [provideLeaveInfo,{isLoading: leaveIsLoading, isSuccess: leaveIsSuccess, isError: leaveIsError, data: leaveData}] = useLeaveInRoomMutation();
-
-    useEffect(()=>{
-        if(!joinIsLoading && joinIsSuccess && !joinIsError && joinData && joinData?.id > 0){
-            toast({title: 'Successfully joined', status: 'success'})
-        }
-        if(!joinIsLoading && !joinIsSuccess && joinIsError){
-            toast({title: 'Internal server error!', status: 'warning'})
-        }
-    },[joinIsLoading, joinIsSuccess, joinIsError, joinData]);
     
     useEffect(()=>{
-        if(!leaveIsLoading && leaveIsSuccess && !leaveIsError && leaveData && leaveData?.id > 0){
-            toast({title: 'Successfully leaved', status: 'success'})
-        }
-        if(!leaveIsLoading && !leaveIsSuccess && leaveIsError){
-            toast({title: 'Internal server error!', status: 'warning'})
-        }
-    },[leaveIsLoading, leaveIsSuccess, leaveIsError, leaveData]);
-    useEffect(()=>{
         if(!isLoading && isSuccess && !isError && data && data?.id > 0){
-            localStorage.removeItem('room__id');
-            toast({title: 'Successfully deleted your board.', status: 'success'})
-        }
-        if(!isLoading && !isSuccess && isError){
-            toast({title: 'Internal server error!', status: 'warning'})
-        }
+            localStorage.removeItem('room__id'); 
+        } 
     },[isLoading, isSuccess, isError, data]);
     
 
     const [showManual, setShowManual] = useState(false);
+
     const handleJoinInRoom = () => { 
-        let getUserId = prompt('Enter your user ID for join this board :)')
-        if(getUserId && getUserId === userId){ 
+        setJoinDebounceLoading(()=> false);
+        if(info.id && info.roomId && userId){
             provideJoinInfo({id: info.id, roomId: info.roomId, userId})
         }
     }
+
+    const handleJoinDebounce = _.debounce(handleJoinInRoom, 1000);
+
+
+    const handleJoinInRoomFirst = () => {
+        setJoinDebounceLoading(()=> true);
+        handleJoinDebounce();
+    }
     const handleLeaveInRoom = () => { 
-        let getUserId = prompt('Enter your user ID for leave this board :)')
-        if(getUserId && getUserId === userId){ 
-            provideLeaveInfo({id: info.id, roomId: info.roomId, userId})
+        setLeaveDebounceLoading(()=> false);
+        if(info.id && info.roomId && userId){
+            provideLeaveInfo({id: info.id, roomId: info.roomId, userId});
         }
     }
+    const handleLeaveDebounce = _.debounce(handleLeaveInRoom, 1000);
+
+    const handleLeaveInRoomFirst = () => {
+        setLeaveDebounceLoading(()=> true);
+        handleLeaveDebounce();
+
+    }
+
+    const handleDelete = () => { 
+        setDeleteDebounceLoading(()=> false);
+        if(info.id && info.roomId && userId){
+            provideInfo({id: info.id, roomId: info.roomId, userId});
+        }
+    }
+    const handleDeleteDebounce = _.debounce(handleDelete, 1000)
+    const handleDeleteFirst = () => {
+        setDeleteDebounceLoading(()=> true);
+        handleDeleteDebounce();
+    }
+
     return (
         <Box boxShadow={'0 0 3px green'} rounded={'md'} mb='3' p='2'>
             <Box textAlign={'center'} mb='3'>
@@ -134,7 +147,7 @@ const SingleBoard = ({info}) => {
             <Box 
                 display={'grid'}
                 gridGap={'2'}
-                gridTemplateColumns={'calc(50% - 5px) calc(50% - 5px)'}
+                gridTemplateColumns={'calc(50% - 5px) calc(50% - 5px)'} 
                 mb='2'
                 mt='4'
             >
@@ -142,15 +155,17 @@ const SingleBoard = ({info}) => {
                     size='sm' 
                     colorScheme='whatsapp'
                     display={userIdes.indexOf(userId) === -1 && info.member.indexOf(userId) === -1 && info.type !== 'private' ? 'inline' : 'none'}
-                    onClick={handleJoinInRoom}
-                    isLoading={joinIsLoading}
+                    onClick={handleJoinInRoomFirst}
+                    isLoading={joinIsLoading || joinDebounceLoading}
+                    textAlign={'center'}
                 >Join</Button>
                 <Button 
                     size='sm' 
                     colorScheme='whatsapp'
                     display={userIdes.indexOf(userId) !== -1 && info.member.indexOf(userId) !== -1 ? 'inline' : 'none'}
-                    onClick={handleLeaveInRoom}
-                    isLoading={leaveIsLoading}
+                    onClick={handleLeaveInRoomFirst}
+                    isLoading={leaveIsLoading || leaveDebounceLoading}
+                    textAlign={'center'}
                 >Leave</Button>
                 <Button 
                     size='sm' 
@@ -167,22 +182,12 @@ const SingleBoard = ({info}) => {
                     && info.accessIdes.indexOf(userId) !== -1 
                     && info.accessIdes.length === 1 && 
                     <Button 
-                        onClick={()=> provideInfo({userId, id: info.id, roomId: info.roomId})}
+                        onClick={handleDeleteFirst}
                         size='sm' 
-                        isLoading={isLoading}
+                        isLoading={isLoading || deleteDebounceLoading}
                         colorScheme='red'
                     >DELETE</Button>
-                } 
-                <CopyToClipboard text={userId}>
-                    <Button 
-                        size='sm' 
-                        colorScheme='whatsapp'
-                        onClick={()=> toast({
-                            title: 'Successfully user id copied!',
-                            status: 'success'
-                        })}
-                    >Copy User ID</Button> 
-                </CopyToClipboard>
+                }  
             </Box>
         </Box>
     );

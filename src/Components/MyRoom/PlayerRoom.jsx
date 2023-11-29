@@ -1,11 +1,13 @@
 import { Box, Button, HStack, Text, useToast } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import _ from 'lodash';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLeavePlayerInRoomMutation, useStartRoomMutation } from '../../App/features/room/api';
 import PlayingCardView from './CardView';
-
 const PlayerRoom = () => {
+    const [leaveDebounceLoading, setLeaveDebounceLoading] = useState(false);
+    const [startDebounceLoading, setStartDebounceLoading] = useState(false);
     const userId = useSelector((state)=> state?.auth?.auth?.userId);
     const {accessIdes, member, player, playing, roomId, id} = useSelector((state)=> state?.room?.room);
 
@@ -33,6 +35,30 @@ const PlayerRoom = () => {
         }
     },[leaveData, leaveIsError, leaveIsSuccess, leaveError]);
     const navigate = useNavigate();
+
+    const handleLeave = () => {
+        setLeaveDebounceLoading(()=> false);
+        if(roomId && userId && id){
+            provideLeaveInfo({roomId, userId, id});
+        }
+    }
+    const leaveDebounce = _.debounce(handleLeave, 1000)
+    const handleLeaveFirst = () => {
+        setLeaveDebounceLoading(()=> true);
+        leaveDebounce();
+    }
+
+    const handleStart = () => {
+        setStartDebounceLoading(()=> false);
+        if(roomId && userId && id){
+            provideStartInfo({roomId, userId, id})
+        }
+    }
+    const startDebounce = _.debounce(handleStart, 1000);
+    const handleStartFirst = () => {
+        setStartDebounceLoading(()=> true);
+        startDebounce();
+    }
     return (
         <React.Fragment>
             {
@@ -77,8 +103,8 @@ const PlayerRoom = () => {
                     >
                         <Button 
                             width={'100%'}                
-                            isLoading={leaveIsLoading}
-                            onClick={()=> provideLeaveInfo({roomId, userId, id})}
+                            isLoading={leaveIsLoading || leaveDebounceLoading}
+                            onClick={handleLeaveFirst}
                         >LEAVE PLAYER ROOM</Button> 
                     </HStack>
                     <HStack 
@@ -87,9 +113,9 @@ const PlayerRoom = () => {
                     >
                         <Button 
                             width={'100%'}                
-                            isLoading={leaveIsLoading}
+                            isLoading={leaveIsLoading || startDebounceLoading || startIsLoading}
                             isDisabled={player?.length < 2}
-                            onClick={()=> provideStartInfo({roomId, userId, id})}
+                            onClick={handleStartFirst}
                         >START BOARD</Button> 
                     </HStack>
                     <HStack 

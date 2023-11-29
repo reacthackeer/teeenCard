@@ -10,15 +10,16 @@ import {
   Select,
   useToast
 } from '@chakra-ui/react';
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { uid } from 'uid';
 import { useAddSingleBoardMutation } from '../App/features/board/api';
-
 const CreateBoardForm = () => {
   const [provideBoardInfo, {data, isLoading, isSuccess, isError, error}] = useAddSingleBoardMutation();
   const userId = useSelector((state)=> state?.auth?.auth?.userId);
+  const [debounceLoading, setDebounceLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -39,6 +40,7 @@ const CreateBoardForm = () => {
     maxPlayer: '',
   });
 
+  
   const toast = useToast();
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -51,6 +53,7 @@ const CreateBoardForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setDebounceLoading(()=> false);
     formData.adminId = userId;
     formData.roomId = uid(11);
     let { name,  join,  board,  chaal, maxBlindHit, minBlindHit, maxChaalHit, minChaalHit,  blind,  increase,  compare,  type,  isSchedule,  startTime, balanceType, adminId, roomId, maxPlayer} = formData;
@@ -113,6 +116,13 @@ const CreateBoardForm = () => {
       })
     }
   };
+
+  const handleDebounceFunc = _.debounce(handleSubmit, 1000);
+  const handleDebounceSubmit = (e) => {
+    e.preventDefault();
+    setDebounceLoading(()=> true);
+    handleDebounceFunc(e);
+  }
   const navigate = useNavigate();
   useEffect(()=>{  
     if(!isLoading && isSuccess && !isError){
@@ -165,7 +175,7 @@ const CreateBoardForm = () => {
   return (
     
       <Box p={4}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleDebounceSubmit}>
           <FormControl>
             <FormLabel>Name</FormLabel>
             <Input 
@@ -346,7 +356,12 @@ const CreateBoardForm = () => {
             </FormControl>
           )}
 
-          <Button mt={4} colorScheme="teal" type="submit">
+          <Button 
+            mt={4} 
+            colorScheme="teal" 
+            type="submit"
+            isLoading={debounceLoading || isLoading}
+          >
             Create Board
           </Button>
         </form>

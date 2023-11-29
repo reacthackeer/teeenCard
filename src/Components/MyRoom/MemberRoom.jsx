@@ -1,10 +1,13 @@
 import { Box, Button, HStack, Text, useToast } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import _ from 'lodash';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useJoinInRoomPrivateMutation } from '../../App/features/board/api';
 import { useEnterPlayerInRoomMutation } from '../../App/features/room/api';
 const MemberRoom = () => {
+    const [enterDebounceLoading, setEnterDebounceLoading] = useState(false);
+    const [inviteDebounceLoading, setInviteDebounceLoading] = useState(false);
 
     const {accessIdes, member, player, playing, roomId, id, adminId} = useSelector((state)=> state?.room?.room);
     const toast = useToast();
@@ -16,46 +19,40 @@ const MemberRoom = () => {
     const [provideInfoPrivate,{data, isLoading, isError, isSuccess, error}] =  useJoinInRoomPrivateMutation();
     const navigate = useNavigate();
 
+    const confirmInvite = (postInfo) => {
+        setInviteDebounceLoading(()=> false);
+        provideInfoPrivate(postInfo);
+    }
 
-    useEffect(()=>{  
-        if(!isLoading && isSuccess && !isError){
-        if(data && data?.id > 0){  
-            toast({
-            title: "Successfully player invited!",
-            duration: 4000,
-            isClosable: true,
-            status: 'success'
-            })
-        }else{
-            toast({
-            title: error?.data?.error?.message || "Internal server error!",
-            duration: 4000,
-            isClosable: true,
-            status: 'error'
-            })
-        }
-        }
-        if(!isLoading && isError && !isSuccess){
-        toast({
-            title: error?.data?.error?.message || "Internal server error!",
-            duration: 4000,
-            isClosable: true,
-            status: 'error'
-        })
-        }
-    },[data, isLoading, isSuccess, isError, error])
-
+    const confirmDebounce = _.debounce(confirmInvite, 1000);
     const handleInviteMember = () => {
         if(adminId === userId){ 
             let result = prompt('Enter your invited player user id...');
-            if(result){
-                provideInfoPrivate({userId: result, roomId, id});
+            if(result && roomId && id){
+                confirmDebounce({userId: result, roomId, id})
             }else{
                 toast({
                     title: "User id must be required!"
                 })
             }
         }
+    }
+    const inviteDebounce = _.debounce(handleInviteMember, 1000);
+    const handleInviteMemberFirst = () => {
+        setInviteDebounceLoading(()=> true);
+        inviteDebounce();
+    }
+
+    const handleEnter = () => {
+        setEnterDebounceLoading(()=> false);
+        if(roomId && userId && id){
+            provideInfo({roomId, userId, id})
+        }
+    }
+    const enterDebounce = _.debounce(handleEnter, 1000)
+    const handleEnterFirst = () => {
+        setEnterDebounceLoading(()=> true);
+        enterDebounce();
     }
     return (
         <Box  className='my__room__main__container' p={2}>
@@ -98,8 +95,8 @@ const MemberRoom = () => {
                     >
                         <Button 
                             width={'100%'}                
-                            isLoading={enterIsLoading}
-                            onClick={()=> provideInfo({roomId, userId, id})}
+                            isLoading={enterIsLoading || enterDebounceLoading}
+                            onClick={handleEnterFirst}
                         >ENTER PLAYER ROOM</Button> 
                     </HStack>
                     <HStack 
@@ -109,8 +106,8 @@ const MemberRoom = () => {
                         <Button 
                             width={'100%'}          
                             isDisabled={adminId !== userId}
-                            isLoading={isLoading}
-                            onClick={handleInviteMember}
+                            isLoading={isLoading || inviteDebounceLoading}
+                            onClick={handleInviteMemberFirst}
                         >INVITE MEMBER</Button> 
                     </HStack>
                     <HStack 

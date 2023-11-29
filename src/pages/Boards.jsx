@@ -1,4 +1,5 @@
 import { Box, Button, Heading } from '@chakra-ui/react';
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -12,10 +13,20 @@ const Boards = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate(); 
     const {boards, initiated, pages} = useSelector((state)=> state.board);
+    const [debounceLoading, setDebounceLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [viewBoard, setViewBoard] = useState('all');
     let pagesArray = uid(pages).split('');  
 
+    const handleGoCreateBoard = () => {
+        navigate('/create-board');
+        setDebounceLoading(()=> false);
+    }
+    const redirectDebounce = _.debounce(handleGoCreateBoard, 1000)
+    const redirectDebounceClick = () => {
+        setDebounceLoading(()=> true);
+        redirectDebounce();
+    }
     const handleNextButton = () => {
         setCurrentPage((prevState)=> prevState+1)
     }
@@ -39,6 +50,7 @@ const Boards = () => {
     // decide what to  render
     let content = null;
     
+
     
     if(boards && !initiated && boards.length ===0 ){
         content = <LoadingComponent/>
@@ -48,7 +60,7 @@ const Boards = () => {
         content = <div className='loading__container'>
                         <Heading fontSize={'large'}>No Board Founded!</Heading>
                         <Heading mt='1' fontSize={'medium'}>But you can create your board</Heading> 
-                        <Button size={'sm'} mt='3' onClick={()=> navigate('/create-board')}>Create Board</Button>
+                        <Button size={'sm'} mt='3' onClick={redirectDebounceClick} isLoading={debounceLoading}>Create Board</Button>
                     </div>
     }
 

@@ -74,7 +74,7 @@ currencyUtils.registerAccountRootTransactionGenerator = (amount) => {
         demoTotalAppCommission: 0,
         demoTotalPartnerCommission: 0
     };
-    let depositFee = Number(process.env.demoDepositFee);
+    let depositFee = Number(process.env.demoDepositFee || 0);
     if(depositFee > 0){
         transaction.demoTotalWalletWithdrawal = Number(amount);
         transaction.demoCurrentBalance = Number(amount);
@@ -90,7 +90,7 @@ currencyUtils.registerAccountRootTransactionGenerator = (amount) => {
 }
 currencyUtils.registerAccountUserTransactionGenerator = (amount, registerUserID, referralId) => {
     let transactions = [];
-    let depositFee = Number(process.env.demoDepositFee);
+    let depositFee = Number(process.env.demoDepositFee || 0);
     let recentTxrId = currencyUtils.transactionIdGenerator();
 
     if(depositFee > 0){
@@ -147,7 +147,7 @@ currencyUtils.registerAccountUserTransactionGenerator = (amount, registerUserID,
 }
 currencyUtils.transferBalanceTransactionGenerator = (amount, receiverId, referralId, userId) => {
     let transactions = [];
-    let depositFee = Number(process.env.realDepositFee);
+    let depositFee = Number(process.env.realDepositFee || 0);
     let recentTxrId = currencyUtils.transactionIdGenerator();
     let increment = amount;
     if(depositFee > 0){
@@ -229,9 +229,9 @@ currencyUtils.transferBalanceTransactionGenerator = (amount, receiverId, referra
     return {transactions,increment};
 }
 currencyUtils.couponRootAssetUpdate = (amount, balanceType, walletType) => {
-    let demoDepositFee =  process.env.demoDepositFee;
-    let realDepositFee =  process.env.realDepositFee;
-    let offlineDepositFee =  process.env.offlineDepositFee; 
+    let demoDepositFee =  process.env.demoDepositFee || 0;
+    let realDepositFee =  process.env.realDepositFee || 0;
+    let offlineDepositFee =  process.env.offlineDepositFee || 0; 
     let currencyAssetArray = {demoDepositFee: Number(demoDepositFee), realDepositFee: Number(realDepositFee), offlineDepositFee: Number(offlineDepositFee)};
     let rootAssetUpdate = {
         [balanceType.toLowerCase()+`Total${walletType}Withdrawal`]: amount,
@@ -249,9 +249,9 @@ currencyUtils.couponRootAssetUpdate = (amount, balanceType, walletType) => {
 }
 
 currencyUtils.couponRootAssetUpdateDeposit = (amount, balanceType, walletType) => {
-    let demoDepositFee =  process.env.demoDepositFee;
-    let realDepositFee =  process.env.realDepositFee;
-    let offlineDepositFee =  process.env.offlineDepositFee; 
+    let demoDepositFee =  process.env.demoDepositFee || 0;
+    let realDepositFee =  process.env.realDepositFee || 0;
+    let offlineDepositFee =  process.env.offlineDepositFee || 0; 
     let currencyAssetArray = {demoDepositFee: Number(demoDepositFee), realDepositFee: Number(realDepositFee), offlineDepositFee: Number(offlineDepositFee)};
     let rootAssetUpdate = {
         [balanceType.toLowerCase()+`Total${walletType}Deposit`]: amount,
@@ -271,9 +271,75 @@ currencyUtils.couponRootAssetUpdateDeposit = (amount, balanceType, walletType) =
 
 
 currencyUtils.couponRootAssetUserTransactionGenerator = (amount, balanceType, registerUserID, referralId) => {
-    let demoDepositFee =  process.env.demoDepositFee;
-    let realDepositFee =  process.env.realDepositFee;
-    let offlineDepositFee =  process.env.offlineDepositFee; 
+    let demoDepositFee =  process.env.demoDepositFee || 0;
+    let realDepositFee =  process.env.realDepositFee || 0;
+    let offlineDepositFee =  process.env.offlineDepositFee || 0; 
+    let currencyAssetArray = {demoDepositFee: Number(demoDepositFee), realDepositFee: Number(realDepositFee), offlineDepositFee: Number(offlineDepositFee)};
+    let recentTxrId = currencyUtils.transactionIdGenerator();
+    let transactions = [];
+    let inUserTransaction =  {
+        typeName: 'WALLET DEPOSIT',
+        isIn: 'IN',
+        amount: amount,
+        txrId: recentTxrId,
+        userId: registerUserID,
+        sourceId: referralId,
+        balanceType: balanceType.toUpperCase()
+    }
+    transactions.push(inUserTransaction);
+    if(currencyAssetArray[balanceType.toLowerCase()+'DepositFee'] > 0){
+        let inUserTransactionUserCommission = {
+            typeName: 'WALLET DEPOSIT COMMISSION',
+            isIn: 'OUT',
+            amount: (Number(amount) / 100) * currencyAssetArray[balanceType.toLowerCase()+'DepositFee'],
+            txrId: recentTxrId,
+            userId: registerUserID,
+            sourceId: referralId,
+            balanceType: balanceType.toUpperCase()
+        }
+        transactions.push(inUserTransactionUserCommission);
+
+        let inUserTransactionRefCommission = {
+            typeName: 'WALLET DEPOSIT COMMISSION',
+            isIn: 'IN',
+            amount: (Number(amount) / 100) * (currencyAssetArray[balanceType.toLowerCase()+'DepositFee'] / 2),
+            txrId: recentTxrId,
+            userId: referralId,
+            sourceId: registerUserID,
+            balanceType:  balanceType.toUpperCase()
+        }
+
+        transactions.push(inUserTransactionRefCommission)
+
+        let inUserTransactionAppCommission = {
+            typeName: 'WALLET DEPOSIT COMMISSION',
+            isIn: 'IN',
+            amount: (Number(amount) / 100) * (currencyAssetArray[balanceType.toLowerCase()+'DepositFee'] / 2),
+            txrId: recentTxrId,
+            userId: '999999999999',
+            sourceId: registerUserID,
+            balanceType:  balanceType.toUpperCase()
+        }
+        
+        transactions.push(inUserTransactionAppCommission);
+    }
+
+    let newTransaction = {};
+    if(transactions.length === 1){
+        newTransaction.array = transactions;
+        newTransaction.increment = amount
+    }else{
+        newTransaction.array = transactions;
+        newTransaction.increment = transactions[0].amount - transactions[1].amount
+    } 
+    newTransaction.increment.toFixed(30);
+    return newTransaction; 
+}
+
+currencyUtils.couponRootAssetUserTransactionGeneratorWithdrawal = (amount, balanceType, registerUserID, referralId) => {
+    let demoDepositFee =  process.env.demoWithdrawalFee || 0;
+    let realDepositFee =  process.env.realWithdrawalFee || 0;
+    let offlineDepositFee =  process.env.offlineWithdrawalFee || 0; 
     let currencyAssetArray = {demoDepositFee: Number(demoDepositFee), realDepositFee: Number(realDepositFee), offlineDepositFee: Number(offlineDepositFee)};
     let recentTxrId = currencyUtils.transactionIdGenerator();
     let transactions = [];
@@ -330,7 +396,7 @@ currencyUtils.couponRootAssetUserTransactionGenerator = (amount, balanceType, re
         newTransaction.increment = amount
     }else{
         newTransaction.array = transactions;
-        newTransaction.increment = transactions[0].amount - transactions[1].amount
+        newTransaction.increment = transactions[0].amount + transactions[1].amount
     } 
     newTransaction.increment.toFixed(30);
     return newTransaction; 
@@ -344,7 +410,7 @@ currencyUtils.transactionIdGenerator = () => {
 module.exports = {
     currencyUtils
 }
- 
+
 // Linux (most distributions except Alpine), ARM64
 // Linux (Arch Linux), x86_64
 // Linux (Linux Mint), x86_64

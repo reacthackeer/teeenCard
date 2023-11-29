@@ -12,7 +12,6 @@ const WithdrawalRequest = require('../models/WithdrawalRequest');
 
 const handleAddSingleWithdrawalRequest = asyncHandler(async(req, res, next) => {
     let {wallet ,idType ,account , amount , reference, userId, currency} = req.body;
-
     if(wallet && idType && account && currency && amount && reference && userId && currency) {
         try {
             let getUserResult = await User.findOne({where: {userId}});
@@ -25,8 +24,8 @@ const handleAddSingleWithdrawalRequest = asyncHandler(async(req, res, next) => {
                         }else{
                             next(new Error('Internal server error!'))
                         }
-                    } catch (error) {
-                        console.log(error.message);
+                    } catch (error) { 
+                        console.log(error);
                         next(new Error(error.message))
                     }
                 }else{
@@ -87,7 +86,7 @@ const handleConfirmWithdrawalRequest = asyncHandler(async(req, res, next) => {
                 try {
                     let getDepositUserResult = await User.findOne({where:{userId}});
                     if(getDepositUserResult &&  getDepositUserResult.id){
-                        if(Number(getDepositUserResult.realBalance) >= Number(getDepositRequestResult.amount)){
+                        if(Number(getDepositUserResult.realBalance) >= (Number(getDepositRequestResult.amount) + (Number(getDepositRequestResult.amount) / 100) * (Number(process.env.realWithdrawalFee || 0)))){
                             try {
                                 let getCurrencyResult = await Currency.findOne({where: {name: getDepositRequestResult.currency}});
                                 if(getCurrencyResult && getCurrencyResult.id){
@@ -105,7 +104,7 @@ const handleConfirmWithdrawalRequest = asyncHandler(async(req, res, next) => {
                                                     balanceType: 'REAL'
                                                 })
                                                 if(result && result.id){ 
-                                                    let userDepositTransactionGenerate = currencyUtils.couponRootAssetUserTransactionGenerator(amount, 'REAL', userId, getDepositUserResult.referralCode);
+                                                    let userDepositTransactionGenerate = currencyUtils.couponRootAssetUserTransactionGeneratorWithdrawal(amount, 'REAL', userId, getDepositUserResult.referralCode);
                                                     try {
                                                         let result = await Transaction.bulkCreate(userDepositTransactionGenerate.array);
                                                         if(result && result?.length){
@@ -162,7 +161,7 @@ const handleConfirmWithdrawalRequest = asyncHandler(async(req, res, next) => {
                                         console.log(error.message);
                                         next(new Error(error.message))
                                     }
-                                }else{
+                                }else{ 
                                     next(new Error('Internal server error!'));
                                 }
                             } catch (error) {
@@ -177,7 +176,7 @@ const handleConfirmWithdrawalRequest = asyncHandler(async(req, res, next) => {
                 } catch (error) {
                     next(new Error('Internal server error!'));
                 }
-            }else{
+            }else{ 
                 next(new Error('Internal server error'));
             }
         } catch (error) {

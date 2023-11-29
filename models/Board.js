@@ -149,6 +149,11 @@ const Board = sequelize.define('board',{
         type: DataTypes.DATE, 
         allowNull: true,
         defaultValue: DataTypes.NOW
+    },
+    startTime: {
+        type: DataTypes.DATE, 
+        allowNull: true,
+        defaultValue: DataTypes.NOW
     }
 },{
     timestamps: true,

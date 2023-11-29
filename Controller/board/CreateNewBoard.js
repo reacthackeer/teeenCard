@@ -7,13 +7,14 @@ const jsonConverterUtils = require('../../utils/JsonConverter');
 
 
 const handleCreateNewBoard = asyncHandler(async(req, res, next)=>{
+    
     let {name,  join,  board,  chaal,  blind,  increase,  compare,  type,  isSchedule,  startTime, balanceType, adminId, roomId, maxBlindHit , maxChaalHit , minBlindHit , minChaalHit , maxPlayer} = req.body;
     if(name && join && board && chaal && blind  && type && balanceType && adminId && roomId && maxPlayer && maxBlindHit && maxChaalHit && minBlindHit && minChaalHit){
         if((increase === true || increase === false) && (compare === true || compare === false) && (isSchedule === true || isSchedule === false)){
             try {
                 let resultConnectedList = await InRoom.findOne({
                     where: {id: 1}
-                })
+                }) 
                 resultConnectedList = jsonConverterUtils.singleInRoomConverter(resultConnectedList)
                 if(resultConnectedList && resultConnectedList?.id > 0 && resultConnectedList.userIdes.indexOf(adminId) === -1 ){
                     

@@ -148,7 +148,7 @@ const handleDeleteSingleCoupon = asyncHandler(async(req ,res, next)=>{
 });
 const handleGetAllCoupon = asyncHandler(async(req ,res, next)=>{
     try {
-        let walletResult = await Coupon.findAll({})
+        let walletResult = await Coupon.findAll({where: {status: 'pending'}})
         if(walletResult && walletResult.length > 0){
             res.json(walletResult)
         }else{ 

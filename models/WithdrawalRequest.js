@@ -13,8 +13,7 @@ const WithdrawalRequest = sequelize.define('withdrawalRequest',{
     },
     idType: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false, 
     },
     account: {
         type: DataTypes.STRING,

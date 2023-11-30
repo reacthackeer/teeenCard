@@ -1,14 +1,38 @@
 import { Avatar, Box, Button, HStack, Text, useToast } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import _ from 'lodash';
+import React, { useEffect, useState } from 'react';
 import Countdown from 'react-countdown';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLeaveInRoomMutation } from '../../App/features/board/api';
-import { useHitBlindOneExeMutation, useHitBlindTwoExeMutation, useHitChaalOneExeMutation, useHitChaalTwoExeMutation, usePackUpMyCardMutation, useSeeMyPlayingCardMutation, useShowMyCardMutation, useSideMyCardMutation, useValidateUserMutation } from '../../App/features/room/api';
+import {
+    useHitBlindOneExeMutation,
+    useHitBlindTwoExeMutation,
+    useHitChaalOneExeMutation,
+    useHitChaalTwoExeMutation,
+    usePackUpMyCardMutation,
+    useSeeMyPlayingCardMutation,
+    useShowMyCardMutation,
+    useSideMyCardMutation,
+    useValidateUserMutation
+} from '../../App/features/room/api';
 import PlayingCardView from './CardView';
 
 const PlayingRoom = () => {
-    const {room, boardFinish, nameWithCard} = useSelector((state)=> state.room); 
+
+    const [refreshDebounceLoading, setRefreshDebounceLoading] = useState(false);
+    const [leaveDebounceLoading, setLeaveDebounceLoading] = useState(false);
+    const [seeCardDebounceLoading, setSeeCardDebounceLoading] = useState(false);
+    const [showCardDebounceLoading, setShowCardDebounceLoading] = useState(false);
+    const [sideCardDebounceLoading, setSideCardDebounceLoading] = useState(false);
+    const [packUpDebounceLoading, setPackUpDebounceLoading] = useState(false); 
+    const [blindOneExeDebounceLoading, setBlindOneExeDebounceLoading] = useState(false); 
+    const [blindTwoExeDebounceLoading, setBlindTwoExeDebounceLoading] = useState(false); 
+    const [chaalOneExeDebounceLoading, setChaalOneExeDebounceLoading] = useState(false); 
+    const [chaalTwoExeDebounceLoading, setChaalTwoExeDebounceLoading] = useState(false); 
+
+
+    const {room, boardFinish} = useSelector((state)=> state.room); 
     let {currentId, isStart, totalBalance, increase, playing, roomId, id} = room;
     const myBalance = useSelector((state)=> state.auth.auth[`${room.balanceType}Balance`]);
     const {userId} = useSelector((state)=> state.auth.auth); 
@@ -158,12 +182,17 @@ const PlayingRoom = () => {
     }
     
     const handleLeaveMyInfo = () => {
-        let result = prompt('If you want to leave this room please enter your userId');
-        if(userId === result){
+        setLeaveDebounceLoading(()=> false);
+        if(roomId && userId && id){
             provideLeaveInRoomInfo({roomId, userId, id});
         }
+        
     } 
-
+    let leaveDebounce = _.debounce(handleLeaveMyInfo, 1000);
+    const handleLeaveMyInfoFirst = () => {
+        setLeaveDebounceLoading(()=> true);
+        leaveDebounce();
+    } 
     const handleCheckSeeCardAvailable = () => {
         let result = true;
         playing.forEach((info)=>{
@@ -187,7 +216,118 @@ const PlayingRoom = () => {
         })
         return result;
     }
+    const handleRefresh = () => {
+        setRefreshDebounceLoading(()=> false);
+        if(roomId && id && currentId){
+            provideValidateUserInfo({roomId, id, userId:currentId})
+        }
+    }
+    const refreshDebounce = _.debounce(handleRefresh, 1000);
+    const handleRefreshFirst = () => {
+        setRefreshDebounceLoading(()=> true);
+        refreshDebounce();
+    }
 
+
+    const handlePackUp = () => {
+        setPackUpDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            providePackUpMyCardInfo({roomId, id, userId})
+        }
+    }
+    const packUpDebounce = _.debounce(handlePackUp, 1000);
+    const handlePackUpFirst = () => {
+        setPackUpDebounceLoading(()=> true);
+        packUpDebounce();
+    }
+
+
+    const handleSeeCard = () => {
+        setSeeCardDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            provideSeePlayingCardInfo({roomId, id, userId})
+        }
+    }
+    const seeCardDebounce = _.debounce(handleSeeCard, 1000);
+    const handleSeeCardFirst = () => {
+        setSeeCardDebounceLoading(()=> true);
+        seeCardDebounce();
+    }
+
+    
+    const handleShowCard = () => {
+        setShowCardDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            provideCardShowInfo({roomId, id, userId})
+        }
+    }
+    const showCardDebounce = _.debounce(handleShowCard, 1000);
+    const handleShowCardFirst = () => {
+        setShowCardDebounceLoading(()=> true);
+        showCardDebounce();
+    }
+
+    const handleSideCard = () => {
+        setSideCardDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            provideCardSideInfo({roomId, id, userId})
+        }
+    }
+    const sideCardDebounce = _.debounce(handleSideCard, 1000);
+    const handleSideCardFirst = () => {
+        setSideCardDebounceLoading(()=> true);
+        sideCardDebounce();
+    }
+
+    
+    const handleBlindOneExe = () => {
+        setBlindOneExeDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            provideBlindOneExeInfo({roomId, id, userId})
+        }
+    }
+    const BlindOneExeDebounce = _.debounce(handleBlindOneExe, 1000);
+    const handleBlindOneExeFirst = () => {
+        setBlindOneExeDebounceLoading(()=> true);
+        BlindOneExeDebounce();
+    }
+
+    const handleBlindTwoExe = () => {
+        setBlindTwoExeDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            provideBlindTwoExeInfo({roomId, id, userId})
+        }
+    }
+    const BlindTwoExeDebounce = _.debounce(handleBlindTwoExe, 1000);
+    const handleBlindTwoExeFirst = () => {
+        setBlindTwoExeDebounceLoading(()=> true);
+        BlindTwoExeDebounce();
+    }
+
+
+    const handleChaalOneExe = () => {
+        setChaalOneExeDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            provideChaalOneExeInfo({roomId, id, userId})
+        }
+    }
+    const ChaalOneExeDebounce = _.debounce(handleChaalOneExe, 1000);
+    const handleChaalOneExeFirst = () => {
+        setChaalOneExeDebounceLoading(()=> true);
+        ChaalOneExeDebounce();
+    }
+
+    const handleChaalTwoExe = () => {
+        setChaalTwoExeDebounceLoading(()=> false);
+        if(roomId && id && userId){
+            provideChaalTwoExeInfo({roomId, id, userId})
+        }
+    }
+    const ChaalTwoExeDebounce = _.debounce(handleChaalTwoExe, 1000);
+    const handleChaalTwoExeFirst = () => {
+        setChaalTwoExeDebounceLoading(()=> true);
+        ChaalTwoExeDebounce();
+    }
 
     return (
         <React.Fragment>
@@ -293,58 +433,58 @@ const PlayingRoom = () => {
                         >My B {Number(myBalance).toFixed(2)} $</Button>
                             {!seen && !handleCheckIsSideRequired() && 
                                 <Button 
-                                    onClick={()=> provideBlindOneExeInfo({roomId, id, userId})}
-                                    isLoading={blindOneExeIsLoading}
+                                    onClick={handleBlindOneExeFirst}
+                                    isLoading={blindOneExeIsLoading || blindOneExeDebounceLoading}
                                 >Blind - {Number(room.blind).toFixed(2)} $</Button>
                             }
                             {!seen && increase === 'true' &&  !handleCheckIsSideRequired() &&
                                 <Button
-                                    onClick={()=> provideBlindTwoExeInfo({roomId, id, userId})}
-                                    isLoading={blindTwoExeIsLoading}
+                                    onClick={handleBlindTwoExeFirst}
+                                    isLoading={blindTwoExeIsLoading || blindTwoExeDebounceLoading}
                                 >Blind 2X  - {Number(room.blind).toFixed(2) * 2} $</Button>
                             }
                             {
                                 seen &&  !handleCheckIsSideRequired() &&
                                 <Button
-                                    onClick={()=> provideChaalOneExeInfo({roomId, id, userId})}
-                                    isLoading={chaalOneExeIsLoading}
+                                    onClick={handleChaalOneExeFirst}
+                                    isLoading={chaalOneExeIsLoading || chaalOneExeDebounceLoading}
                                 >Chaal  - {Number(room.chaal).toFixed(2)} $</Button>
                             }
                             {
                                 seen && increase === 'true' &&  !handleCheckIsSideRequired()&&
                                 <Button
-                                    onClick={()=> provideChaalTwoExeInfo({roomId, id, userId})}
-                                    isLoading={chaalTwoExeIsLoading}
+                                    onClick={handleChaalTwoExeFirst}
+                                    isLoading={chaalTwoExeIsLoading || chaalTwoExeDebounceLoading}
                                 >Chaal 2X   - {Number(room.chaal).toFixed(2) * 2} $</Button>
                             }
                             {
                                 seen && SideAbleUser() && 
                                 <Button
-                                    onClick={()=> provideCardSideInfo({roomId, id, userId})}
-                                    isLoading={sideCardIsLoading}
+                                    onClick={handleSideCardFirst}
+                                    isLoading={sideCardIsLoading || sideCardDebounceLoading}
                                     isDisabled={handleSideAvailable()}
                                 >Side   - {Number(room.blind).toFixed(2) * 1} $</Button>
                             }
                             {
                                 seen && showAbleUser() &&
                                 <Button
-                                    onClick={()=> provideCardShowInfo({roomId, id, userId})}
-                                    isLoading={showCardIsLoading}
+                                    onClick={handleShowCardFirst}
+                                    isLoading={showCardIsLoading || showCardDebounceLoading}
                                     isDisabled={handleSideAvailable()}
                                 >Show   - {Number(room.blind).toFixed(2) * 1} $</Button>
                             }
                             <Button
-                                onClick={()=> provideSeePlayingCardInfo({roomId, id, userId})}
-                                isLoading={seeCardIsLoading}
+                                onClick={handleSeeCardFirst}
+                                isLoading={seeCardIsLoading || seeCardDebounceLoading}
                                 isDisabled={handleCheckSeeCardAvailable()}
                             >SEE CARD</Button>
                             <Button
-                                onClick={()=> providePackUpMyCardInfo({roomId, id, userId})}
-                                isLoading={packUpIsLoading}
+                                onClick={handlePackUpFirst}
+                                isLoading={packUpIsLoading || packUpDebounceLoading}
                             >Pack Up</Button>
                             <Button
-                                onClick={handleLeaveMyInfo}
-                                isLoading={leaveInRoomIsLoading}
+                                onClick={handleLeaveMyInfoFirst}
+                                isLoading={leaveInRoomIsLoading || leaveDebounceLoading}
                             >Leave</Button> 
                         </Box>
                     </Box>
@@ -362,17 +502,17 @@ const PlayingRoom = () => {
                                 title='My Balance'
                             >My B {Number(myBalance).toFixed(2)} $</Button> 
                             <Button
-                                onClick={()=> provideSeePlayingCardInfo({roomId, id, userId})}
-                                isLoading={seeCardIsLoading}
+                                onClick={handleSeeCardFirst}
+                                isLoading={seeCardIsLoading || seeCardDebounceLoading}
                                 isDisabled={handleCheckSeeCardAvailable()}
                             >SEE CARD</Button> 
                             <Button
-                                onClick={handleLeaveMyInfo}
-                                isLoading={leaveInRoomIsLoading}
+                                onClick={handleLeaveMyInfoFirst}
+                                isLoading={leaveInRoomIsLoading || leaveDebounceLoading}
                             >Leave</Button>
                             <Button
-                                onClick={()=> provideValidateUserInfo({roomId, id, userId:currentId})}
-                                isLoading={validateUserIsLoading}
+                                onClick={handleRefreshFirst}
+                                isLoading={validateUserIsLoading || refreshDebounceLoading}
                             >Refresh</Button>
                         </Box>
                     </Box>

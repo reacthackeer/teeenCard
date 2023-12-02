@@ -14,13 +14,17 @@ import { useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { updateSystemCurrency } from '../App/features/Home/homeSlice';
 import { useToggleInvitationMutation } from '../App/features/auth/api';
 import { updateUserAuthInfo, userLoggedOut } from '../App/features/auth/authSlice';
+import { useGetAllCurrencyQuery, useToggleCurrencyMutation } from '../App/features/currency/api';
 const UserProfilePage = () => {
   const toast = useToast();
   const navigate = useNavigate(); 
   const {name, email, phone, myRef, demoBalance, realBalance, offlineBalance, userId, src, invitation, role, designation, isJail , isDisabled} = useSelector((state)=> state.auth?.auth); 
+  const defaultCurrency = useSelector((state)=> state?.home?.currency); 
   const [provideInfo,{data, isLoading, isError, isSuccess, error}] = useToggleInvitationMutation();
+  const {data: currencyData, isSuccess: currencyIsSuccess, isLoading: currencyIsLoading} = useGetAllCurrencyQuery();
   const [debounceLoading, setDebounceLoading] = useState(false);
   const dispatch = useDispatch();
   const handleLogOut = () => {
@@ -32,10 +36,6 @@ const UserProfilePage = () => {
     }))
     localStorage.removeItem('token') 
   }
-
-  // const handleToggleInvitation = () => {
-  //     provideInfo({userId, email});
-  // }
 
   const handleToggleInvitation = () => {
     setDebounceLoading(()=> false);
@@ -88,6 +88,54 @@ const UserProfilePage = () => {
     }
     return result;
   } 
+  const [toggleCurrencyDebounceLoading, setToggleCurrencyDebounceLoading] = useState(false);
+  const [provideToggleCurrencyInfo, {
+      data: toggleCurrencyData, 
+      isLoading: toggleCurrencyIsLoading, 
+      isSuccess: toggleCurrencyIsSuccess, 
+      isError: toggleCurrencyIsError,
+      error: toggleCurrencyError
+    }
+    ] = useToggleCurrencyMutation();
+
+  const handleToggleCurrency = () => {
+    setToggleCurrencyDebounceLoading(()=> false);
+    provideToggleCurrencyInfo(defaultCurrency?.name || "Usd");
+  };
+  const debouncedHandleToggleCurrency = _.debounce(handleToggleCurrency, 1000); 
+  const handleDebounceToggleCurrency = () => {
+    setToggleCurrencyDebounceLoading(()=> true);
+    debouncedHandleToggleCurrency();
+  }
+  useEffect(()=>{ 
+    if(!toggleCurrencyIsLoading && toggleCurrencyIsSuccess && !toggleCurrencyIsError){
+      if(toggleCurrencyData && toggleCurrencyData?.id > 0){
+        dispatch(updateSystemCurrency(toggleCurrencyData))
+        toast({
+          title: 'Successfully '+toggleCurrencyData?.name+" currency toggled.",
+          duration: 4000,
+          isClosable: true,
+          status: 'success'
+        })
+        localStorage.setItem('default__currency', JSON.stringify(toggleCurrencyData))
+      }else{
+        toast({
+          title: toggleCurrencyError?.data?.error?.message || "Internal server error!",
+          duration: 4000,
+          isClosable: true,
+          status: 'error'
+        })
+      }
+    }
+    if(!toggleCurrencyIsLoading && toggleCurrencyIsError && !toggleCurrencyIsSuccess){
+      toast({
+        title: toggleCurrencyError?.data?.error?.message || "Internal server error!",
+        duration: 4000,
+        isClosable: true,
+        status: 'error'
+      })
+    }
+  },[toggleCurrencyData, toggleCurrencyIsLoading, toggleCurrencyIsSuccess, toggleCurrencyIsError, toggleCurrencyError])
   return (
     <Container maxW="lg" mt={10}>
       <Box display="flex" flexDirection="column" alignItems="center">
@@ -106,24 +154,51 @@ const UserProfilePage = () => {
           Referral Code: {myRef.toUpperCase()}
         </Text>
         <Text fontSize="lg" mb={1}>
-          User ID: <CopyToClipboard text={userId.toUpperCase()}><Button size={'sm'} ml='2' onClick={()=> toast({title: 'Successfully copied', status: 'success', isClosable: true})}>{userId.toUpperCase()}</Button></CopyToClipboard>
+          Demo Balance: {Number(Number(demoBalance) * (defaultCurrency.currencyRate)).toFixed(2)} {defaultCurrency?.name.toUpperCase()}
+        </Text>
+        <Text 
+          fontSize="lg" 
+          mb={1}
+        >
+          Current Balance: {Number(Number(realBalance) * (defaultCurrency.currencyRate)).toFixed(2)} {defaultCurrency?.name?.toUpperCase()}
         </Text>
         <Text fontSize="lg" mb={1}>
-          Demo Balance: {Number(demoBalance).toFixed(3)} $
-        </Text>
-        <Text fontSize="lg" mb={1}>
-          Current Balance: {Number(realBalance).toFixed(3)} $
-        </Text>
-        <Text fontSize="lg" mb={1}>
-          Offline Balance: {Number(offlineBalance).toFixed(3)} $
+          Offline Balance: {Number(Number(offlineBalance) * (defaultCurrency.currencyRate)).toFixed(2)} {defaultCurrency?.name?.toUpperCase()}
         </Text>
         <Text 
           fontSize={'lg'} 
         >Invitation: 
           <Button 
+            ml='2'
             onClick={handleDebouncedToggleInvitation}
             isLoading={isLoading || debounceLoading}
-          >{invitation}</Button></Text>
+          >{invitation}</Button>
+        </Text>
+        <Text 
+          fontSize={'lg'} 
+        >Currency: 
+          <Button 
+            mt='2'
+            ml='2'
+            onClick={handleDebounceToggleCurrency}
+            isLoading={toggleCurrencyIsLoading || toggleCurrencyDebounceLoading}
+          >{defaultCurrency?.name?.toUpperCase()}</Button>
+        </Text>
+          <Text 
+            fontSize="lg" 
+            mt={2}
+          >
+          User ID: <CopyToClipboard 
+                      text={userId.toUpperCase()}
+                      >
+                        <Button 
+                          size={'sm'} 
+                          ml='2' 
+                          onClick={()=> toast({title: 'Successfully copied', status: 'success', isClosable: true})}
+                        >{userId.toUpperCase()}</Button>
+                    </CopyToClipboard>
+        </Text> 
+
         <Divider my={6} />
       </Box>
       <VStack>

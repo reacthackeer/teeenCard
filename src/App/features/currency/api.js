@@ -31,7 +31,13 @@ export const currencyApi = apiSlice.injectEndpoints({
                 body: walletId
             }),
             invalidatesTags: ()=> [{type: 'getAllCurrency'}]
-        })
+        }),
+        toggleCurrency: builder.mutation({
+            query: (currentCurrency) => ({
+                url: `/currency/toggle/${currentCurrency}`,
+                method: 'POST',
+            })
+        }), 
         
     })
 })
@@ -40,5 +46,6 @@ export const {
     useAddSingleCurrencyMutation,
     useGetAllCurrencyQuery,
     useDeleteSingleCurrencyMutation,
-    useGetAllReferralIncomeQuery
+    useGetAllReferralIncomeQuery,
+    useToggleCurrencyMutation
 } = currencyApi;

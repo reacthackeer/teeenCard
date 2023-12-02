@@ -118,7 +118,7 @@ export const authApi = apiSlice.injectEndpoints({
                 url: `/auth/reset-connection/${userId}`,
                 method: 'PUT', 
             })
-        }),
+        }) 
     })
 })
 

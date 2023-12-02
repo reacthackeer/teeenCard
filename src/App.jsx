@@ -14,6 +14,7 @@ import ChangePasswordPage from "./pages/ChangePassword";
 import CreateBoardForm from "./pages/CreateBoard";
 import DepositPage from "./pages/Deposit";
 import DepositRequest from "./pages/DepositRequest";
+import Design from "./pages/Design";
 import HomeGame from "./pages/HomeGame";
 import LoginPage from "./pages/Login";
 import MyRoom from "./pages/MyRoom";
@@ -39,6 +40,14 @@ const router = createBrowserRouter([
         element: <React.Fragment> 
                         <UserPrivate>
                             <CreateBoardForm/> 
+                        </UserPrivate>
+                </React.Fragment>,
+    },
+    {
+        path: "/design",
+        element: <React.Fragment> 
+                        <UserPrivate>
+                            <Design/> 
                         </UserPrivate>
                 </React.Fragment>,
     },

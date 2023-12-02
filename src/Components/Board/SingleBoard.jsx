@@ -7,11 +7,12 @@ import { useNavigate } from 'react-router-dom';
 import { useDeleteSingleBoardMutation, useJoinInRoomMutation, useLeaveInRoomMutation } from '../../App/features/board/api';
 
 const SingleBoard = ({info}) => {    
-
+    const [currentShowingIndex, setCurrentShowingIndex] = useState(0);
+    const defaultCurrency = useSelector((state)=> state?.home?.currency);
     const [joinDebounceLoading, setJoinDebounceLoading] = useState(false);
     const [leaveDebounceLoading, setLeaveDebounceLoading] = useState(false);
     const [deleteDebounceLoading, setDeleteDebounceLoading] = useState(false);
-
+    
     const toast = useToast();
     let userId = useSelector((state)=> state.auth.auth.userId);
     const navigate = useNavigate();
@@ -75,66 +76,131 @@ const SingleBoard = ({info}) => {
             <Box textAlign={'center'} mb='3'>
                 <Heading fontSize={'xl'}>{info.name}</Heading>
             </Box>
-            <Box display={'grid'}  gridTemplateColumns={'auto auto'} gridGap={'3'}>
-                <Box  
-                    display={'grid'}
-                    gridTemplateColumns={'auto auto'}
-                    justifyContent={'space-around'}  
-                    gridGap={'3'}
-                >
-                    <Button>JOIN</Button>
-                    <Button>{info.join} $</Button>
-                    <Button>BOARD</Button>
-                    <Button>{info.board} $</Button>
-                    <Button>BLIND</Button>
-                    <Button>{info.blind} $</Button> 
-                    <Button>CHAAL</Button>
-                    <Button>{info.chaal} $</Button>     
-                </Box>
-                <Box  
-                    display={'grid'}
-                    gridTemplateColumns={'auto auto'}
-                    justifyContent={'space-around'}
-                    gridGap={'3'}
-                >
-                    <Button>BALANCE</Button>
-                    <Button>{info.balanceType.toUpperCase()}</Button>   
-                    <Button>RUNNING</Button>
-                    <Button>{info.isStart === 'true' ? "YES" : "NO"}</Button>   
-                    <Button>MEMBER</Button>
-                    <Button>{info.member.length}</Button>     
-                    <Button>PLAYER</Button>
-                    <Button>{info.player.length}</Button>     
-                </Box> 
-            </Box> 
-            <Box display={'grid'}  gridTemplateColumns={'100%'} gridGap={'3'}>
-            <Box  
-                display={'grid'}
-                gridTemplateColumns={'calc(80% - 12px) 20%'}
-                justifyContent={'space-around'}   
-                gridGap={3}
-                mt='3'
+            {/*balance and charge*/}
+            <Box 
+                width={'100%'}
+                mb='2'
             >
-                <Button width={'100%'}>Board Type</Button>
-                <Button width={'100%'}>{info.type}</Button>
-                <Button width={'100%'}>SCHEDULE</Button>
-                <Button width={'100%'}>{info.isSchedule === 'true' ? "YES": "NO"}</Button>
-                <Button width={'100%'}>Hit Increasable</Button>
-                <Button width={'100%'}>{info.increase === 'true'? "YES":"NO"}</Button>
-                <Button width={'100%'}>Comparable</Button>
-                <Button width={'100%'}>{info.compare === 'true'? "YES" : "NO"}</Button> 
-                <Button width={'100%'}>Max Player Allowed</Button>
-                <Button width={'100%'}>{info.maxPlayer}</Button>
-                <Button width={'100%'}>Maximum Blind Hit</Button>
-                <Button width={'100%'}>{info.maxBlindHit}</Button>
-                <Button width={'100%'}>Minimum Blind Hit</Button>
-                <Button width={'100%'}>{info.minBlindHit}</Button> 
-                <Button width={'100%'}>Maximum Chaal Hit</Button>
-                <Button width={'100%'}>{info.maxChaalHit}</Button>
-                <Button width={'100%'}>Minimum Chaal Hit</Button>
-                <Button width={'100%'}>{info.minChaalHit}</Button> 
-            </Box> 
-        </Box> 
+                <Button
+                    width={'100%'}
+                    bg={currentShowingIndex === 1 ? 'telegram.300' : 'gray.100'}
+                    onClick={()=> currentShowingIndex === 1 ? setCurrentShowingIndex(()=> 0) : setCurrentShowingIndex(()=> 1)}
+                >Balance and charge</Button>
+
+                {                
+                    currentShowingIndex ===  1 &&
+                    <Box  
+                        display={'grid'}
+                        gridTemplateColumns={'calc(70% - 12px) 30%'}
+                        justifyContent={'space-around'}   
+                        gridGap={3}
+                        mt='3'
+                    >   
+                        <Button>BALANCE TYPE</Button>
+                        <Button>{info.balanceType.toUpperCase()}</Button> 
+                        <Button>JOIN</Button>
+                        <Button>{Number(Number(info.join)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button>
+                        <Button>BOARD</Button>
+                        <Button>{Number(Number(info.board)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button>
+                        <Button>BLIND</Button>
+                        <Button>{Number(Number(info.blind)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button> 
+                        <Button>CHAAL</Button>
+                        <Button>{Number(Number(info.chaal)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button> 
+                    </Box> 
+                }
+            </Box>
+            {/*hit and hit limit*/}
+            <Box 
+                width={'100%'}
+                mb='2'
+            >
+                <Button
+                    width={'100%'}
+                    bg={currentShowingIndex === 2 ? 'telegram.300' : 'gray.100'}
+                    onClick={()=> currentShowingIndex === 2 ? setCurrentShowingIndex(()=> 0) : setCurrentShowingIndex(()=> 2)}
+                >Hit and hit limit</Button>
+                {                
+                    currentShowingIndex ===  2 &&
+                    <Box  
+                        display={'grid'}
+                        gridTemplateColumns={'calc(70% - 12px) 30%'}
+                        justifyContent={'space-around'}   
+                        gridGap={3}
+                        mt='3'
+                    >
+                        <Button width={'100%'}>Maximum Blind Hit</Button>
+                        <Button width={'100%'}>{info.maxBlindHit}</Button>
+                        <Button width={'100%'}>Minimum Blind Hit</Button>
+                        <Button width={'100%'}>{info.minBlindHit}</Button> 
+                        <Button width={'100%'}>Maximum Chaal Hit</Button>
+                        <Button width={'100%'}>{info.maxChaalHit}</Button>
+                        <Button width={'100%'}>Minimum Chaal Hit</Button>
+                        <Button width={'100%'}>{info.minChaalHit}</Button>
+                    </Box> 
+                }
+            </Box>
+            {/* player and limit*/}
+            <Box 
+                width={'100%'}
+                mb='2'
+            >
+                <Button
+                    width={'100%'}
+                    bg={currentShowingIndex === 3 ? 'telegram.300' : 'gray.100'}
+                    onClick={()=> currentShowingIndex === 3 ? setCurrentShowingIndex(()=> 0) : setCurrentShowingIndex(()=> 3)}
+                >Player and limit</Button>
+
+                {                
+                            currentShowingIndex ===  3 &&
+                            <Box  
+                                display={'grid'}
+                                gridTemplateColumns={'calc(70% - 12px) 30%'}
+                                justifyContent={'space-around'}   
+                                gridGap={3}
+                                mt='3'
+                            >
+                                <Button width={'100%'}>Max Player Allowed</Button>
+                                <Button width={'100%'}>{info.maxPlayer}</Button> 
+                                <Button>MEMBER</Button>
+                                <Button>{info.member.length}</Button>     
+                                <Button>PLAYER</Button>
+                                <Button>{info.player.length}</Button> 
+                            </Box> 
+                }
+            </Box>
+            {/* Board Condition*/}
+            <Box 
+                width={'100%'}
+                mb='2'
+            >
+                <Button
+                    width={'100%'}
+                    bg={currentShowingIndex === 4 ? 'telegram.300' : 'gray.100'}
+                    onClick={()=> currentShowingIndex === 4 ? setCurrentShowingIndex(()=> 0) : setCurrentShowingIndex(()=> 4)}
+                >Board Condition</Button>
+
+                {                
+                            currentShowingIndex ===  4 &&
+                            <Box  
+                                display={'grid'}
+                                gridTemplateColumns={'calc(70% - 12px) 30%'}
+                                justifyContent={'space-around'}   
+                                gridGap={3}
+                                mt='3'
+                            >
+                                <Button>RUNNING</Button>
+                                <Button>{info.isStart === 'true' ? "YES" : "NO"}</Button>   
+                                <Button width={'100%'}>Board Type</Button>
+                                <Button width={'100%'}>{info.type}</Button>
+                                <Button width={'100%'}>SCHEDULE</Button>
+                                <Button width={'100%'}>{info.isSchedule === 'true' ? "YES": "NO"}</Button>
+                                <Button width={'100%'}>Hit Increasable</Button>
+                                <Button width={'100%'}>{info.increase === 'true'? "YES":"NO"}</Button>
+                                <Button width={'100%'}>Comparable</Button>
+                                <Button width={'100%'}>{info.compare === 'true'? "YES" : "NO"}</Button> 
+                            </Box> 
+                }
+            </Box>
             {showManual && 
             <Box m='2'>
                 <Text textAlign={'justify'}>If you want to participate in this game then you need to have minimum {info.join} dollars in your account. ${info.board} per board fee during play. The blind hit ${info.blind}. chaal hits can be deducted ${info.chaal}. {info.balanceType.toUpperCase()} dollars can be deducted from your account during this game. (If Comparable: Yes) If your account runs out of {info.balanceType.toUpperCase()} dollars while playing, you can compare your cards with everyone else. If your card is first, then all the dollars of that board will be added to your account and the board balance will be 0 dollars and the game will continue as before. (If Increasable: Yes) Any player can increase hits while playing. Then the next player has to give that hit. Otherwise he has to pack. So read the board manual carefully before joining any board.</Text>

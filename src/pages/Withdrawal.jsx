@@ -70,7 +70,7 @@ const DepositByWallet = () => {
                     account: wallet,
                     amount,
                     reference,
-                    currency: 'Usdt',
+                    currency: 'Usd',
                     userId: authInfo.userId
                 }  
                 provideDepositRequestInfo(postInfo);

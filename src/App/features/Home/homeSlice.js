@@ -236,7 +236,8 @@ const initialState = {
             }
         }
     ],
-    language: 'english'
+    language: 'english',
+    currency: {name: 'Usd', dollar: 1, currencyRate: 1}
 }
 const homeSlice = createSlice({
     name: 'home',
@@ -245,9 +246,15 @@ const homeSlice = createSlice({
         updateSystemLanguage: (state, action) => {  
             state.language = action.payload
         },
+        updateSystemCurrency: (state, action) => {  
+            state.currency = action.payload
+        },
     }
 });
-export const {updateSystemLanguage} = homeSlice.actions;
+export const {
+        updateSystemLanguage,
+        updateSystemCurrency
+    } = homeSlice.actions;
 export default homeSlice.reducer;
 
 

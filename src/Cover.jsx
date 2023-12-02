@@ -3,7 +3,7 @@ import nuid from 'number-uid';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { io } from 'socket.io-client';
-import { updateSystemLanguage } from './App/features/Home/homeSlice';
+import { updateSystemCurrency, updateSystemLanguage } from './App/features/Home/homeSlice';
 import { userBalanceDecrement, userBalanceIncrement } from './App/features/auth/authSlice';
 import { addMultiplePlayingInBoard, addNewBoard, addNewMemberInBoard, addNewPlayerInBoard, addNewPlayingInBoard, removeBoard, removeSingleMember, removeSinglePlayer, removeSinglePlaying, updateIdesAndRoomWithId, updateRunningStatus, updateSingleWholeBoard } from './App/features/board/boardSlice';
 import { addMultiplePlayingInRoom, addNewMemberInRoom, addNewPlayerInRoom, addNewPlayingInRoom, removeSingleMemberInRoom, removeSinglePlayerInRoom, removeSinglePlayingInRoom, resetRoomFinish, roomFinish, updateRunningStatusInRoom, updateSingleWholeRoom } from './App/features/room/roomSlice';
@@ -56,6 +56,14 @@ const Cover = ({children}) => {
             systemLanguage = newSystemLanguage;
         }
         dispatch(updateSystemLanguage(systemLanguage));
+        let defaultCurrency = {name: 'Usd', dollar: 1, currencyRate: 1};
+        let newDefaultCurrency = JSON.parse(localStorage.getItem('default__currency')) || '';
+        if(!newDefaultCurrency){
+            localStorage.setItem('default__currency', JSON.stringify(defaultCurrency))
+            dispatch(updateSystemCurrency(defaultCurrency));
+        }else{
+            dispatch(updateSystemCurrency(newDefaultCurrency));
+        }
     },[]);  
     
     useEffect(()=>{

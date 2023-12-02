@@ -194,3 +194,28 @@
 .board__controller__main__container.active{
     left: 2px;
 }
+
+.design__main__container{
+    position: relative;
+    background-color: green;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 19% 19% 19% 19% 19%;
+    justify-content: space-between;
+
+    .design__item{
+        position: relative;
+        height: 30px;
+        background-color: red;
+        clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+    }
+    .item__one{
+        clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%);
+    }
+    .item__three{ 
+        scale: 130% 100%;
+    }
+    .item__five{
+        clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+}

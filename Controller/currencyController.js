@@ -91,10 +91,34 @@ const handleGetAllReferralIncome = asyncHandler(async(req, res, next)=>{
         }
         }
 });
+const handleToggleCurrency = asyncHandler(async(req, res, next)=>{
+    let {currencyName} = req.params; 
+    if(currencyName){ 
+        try {
+            let result = await Currency.findAll({}); 
+            if(result && result?.length > 0){
+                let allCurrencyArray = [];
+                result.forEach((info)=>{
+                    allCurrencyArray.push(info.dataValues.name.toLowerCase());
+                })
+                let currentCurrencyIndex = allCurrencyArray.indexOf(currencyName.toLowerCase());
+                let toggleCurrency = result[currentCurrencyIndex + 1] ? result[currentCurrencyIndex + 1] : result[0]; 
+                res.json(toggleCurrency);
+            }else{
+                next(new Error('Only one currency available!'))
+            }
+        } catch (error) {
+            next(new Error(error.message))
+        }
+    }else{
+        next(new Error('Invalid server request!'))
+    }
+})
 
 module.exports = {
     handleAddSingleCurrency,
     handleDeleteSingleCurrency,
     handleGetAllCurrency,
-    handleGetAllReferralIncome
+    handleGetAllReferralIncome,
+    handleToggleCurrency
 }

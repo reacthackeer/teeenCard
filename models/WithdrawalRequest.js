@@ -22,7 +22,7 @@ const WithdrawalRequest = sequelize.define('withdrawalRequest',{
     currency: {
         type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: 'Usdt'
+        defaultValue: 'Usd'
     },
     amount: {
         type: DataTypes.DECIMAL(20,4),

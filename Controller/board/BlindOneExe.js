@@ -7,6 +7,7 @@ const Transaction = require('../../models/Transaction');
 const RootAsset = require('../../models/RootAsset');
 const ConnectedList = require('../../models/ConnectedList');
 const jsonConverterUtils = require('../../utils/JsonConverter');
+const PlayingHistory = require('../../models/PlayingHistory');
 
 const handleBlindOneExe = asyncHandler(async(req, res, next)=>{
     let {roomId, userId, id} = req.body;
@@ -431,15 +432,32 @@ const handleBlindOneExe = asyncHandler(async(req, res, next)=>{
                                                                     try {
                                                                         let resultGetAllConnectedList = await ConnectedList.findAll({attributes:['socketId']})
                                                                         if(resultGetAllConnectedList && resultGetAllConnectedList?.length > 0){ 
-                                                                            let newRoomInfo = {...myRoomUpdateResult};
-                                                                            newRoomInfo.playing = newRoomInfo.playing.map((playingInfo)=>{
-                                                                                delete playingInfo.card;
-                                                                                return playingInfo;
+                                                                            let boardHistory = {
+                                                                                winnerId: userId,
+                                                                                members: [],
+                                                                                playingInfo: newPlaying
+                                                                            }
+                                                                            newPlaying.forEach((info)=>{
+                                                                                boardHistory.members.push(info.userId);
                                                                             })
-                                                                            resultGetAllConnectedList.forEach((info)=>{
-                                                                                io.sockets.in(info.socketId).emit('boardFinish',{roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying})
-                                                                            });
-                                                                            res.json({roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying});
+                                                                            try {
+                                                                                let playingHistoryResult = await PlayingHistory.create(boardHistory);
+                                                                                if(playingHistoryResult && playingHistoryResult.id){
+                                                                                    let newRoomInfo = {...myRoomUpdateResult};
+                                                                                    newRoomInfo.playing = newRoomInfo.playing.map((playingInfo)=>{
+                                                                                        delete playingInfo.card;
+                                                                                        return playingInfo;
+                                                                                    })
+                                                                                    resultGetAllConnectedList.forEach((info)=>{
+                                                                                        io.sockets.in(info.socketId).emit('boardFinish',{roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying})
+                                                                                    });
+                                                                                    res.json({roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying});
+                                                                                }else{
+                                                                                    next(new Error('Playing history updated fail!'))
+                                                                                }
+                                                                            } catch (error) {
+                                                                                next(new Error(error.message))
+                                                                            }
                                                                         }else{
                                                                             next(new Error('Internal server error!'))
                                                                         }
@@ -631,15 +649,32 @@ const handleBlindOneExe = asyncHandler(async(req, res, next)=>{
                                                                     try {
                                                                         let resultGetAllConnectedList = await ConnectedList.findAll({attributes: ['socketId']});
                                                                         if(resultGetAllConnectedList && resultGetAllConnectedList?.length > 0){ 
-                                                                            let newRoomInfo = {...myRoomUpdateResult};
-                                                                            newRoomInfo.playing = newRoomInfo.playing.map((playingInfo)=>{
-                                                                                delete playingInfo.card;
-                                                                                return playingInfo;
+                                                                            let boardHistory = {
+                                                                                winnerId: winnerPlaying.userId,
+                                                                                members: [],
+                                                                                playingInfo: newPlaying
+                                                                            }
+                                                                            newPlaying.forEach((info)=>{
+                                                                                boardHistory.members.push(info.userId);
                                                                             })
-                                                                            resultGetAllConnectedList.forEach((info)=>{
-                                                                                io.sockets.in(info.socketId).emit('boardFinish',{roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying})
-                                                                            });
-                                                                            res.json({roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying});
+                                                                            try {
+                                                                                let playingHistoryResult = await PlayingHistory.create(boardHistory);
+                                                                                if(playingHistoryResult && playingHistoryResult.id){
+                                                                                    let newRoomInfo = {...myRoomUpdateResult};
+                                                                                    newRoomInfo.playing = newRoomInfo.playing.map((playingInfo)=>{
+                                                                                        delete playingInfo.card;
+                                                                                        return playingInfo;
+                                                                                    })
+                                                                                    resultGetAllConnectedList.forEach((info)=>{
+                                                                                        io.sockets.in(info.socketId).emit('boardFinish',{roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying})
+                                                                                    });
+                                                                                    res.json({roomId: myRoomResult.roomId, roomInfo: newRoomInfo, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance), playingInfo: newPlaying});
+                                                                                }else{
+                                                                                    next(new Error('Playing history updated fail!'))
+                                                                                }
+                                                                            } catch (error) {
+                                                                                next(new Error(error.message))
+                                                                            }
                                                                         }else{
                                                                             next(new Error('Internal server error!'))
                                                                         }

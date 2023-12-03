@@ -14,29 +14,48 @@ const handleAddSingleWithdrawalRequest = asyncHandler(async(req, res, next) => {
     let {wallet ,idType ,account , amount , reference, userId, currency} = req.body;
     if(wallet && idType && account && currency && amount && reference && userId && currency) {
         try {
-            let getUserResult = await User.findOne({where: {userId}});
-            if(getUserResult && getUserResult.id){
-                if(Number(getUserResult.realBalance) >= Number(amount)){
-                    try {
-                        let result = await  WithdrawalRequest.create(req.body);
-                        if(result && result.id){
-                            res.json(result);
+            let currencyResult = await Currency.findOne({where: {
+                name: currency
+            }});
+            if(currencyResult && currencyResult.id){
+
+                let amountConvertToDollar = Number(amount) / Number(currencyResult.currencyRate); 
+                let postData = {
+                    ...req.body,
+                    currency: 'Usd',
+                    amount: amountConvertToDollar
+                }
+                try {
+                    let getUserResult = await User.findOne({where: {userId}});
+                    if(getUserResult && getUserResult.id){
+                        if(Number(getUserResult.realBalance) >= Number(amount) / Number(currencyResult.currencyRate)){
+                            try {
+                                let result = await  WithdrawalRequest.create(postData);
+                                if(result && result.id){
+                                    res.json(result);
+                                }else{
+                                    next(new Error('Internal server error!'))
+                                }
+                            } catch (error) { 
+                                console.log(error);
+                                next(new Error(error.message))
+                            }
                         }else{
-                            next(new Error('Internal server error!'))
+                            next(new Error('Balance low!'))
                         }
-                    } catch (error) { 
-                        console.log(error);
-                        next(new Error(error.message))
+                    }else{
+                        next(new Error('Internal server error!'))
                     }
-                }else{
-                    next(new Error('Balance low!'))
+                } catch (error) {
+                    next(new Error(error.message))
                 }
             }else{
-                next(new Error('Internal server error!'))
+                next(new Error('Currency not found!'))
             }
         } catch (error) {
             next(new Error(error.message))
         }
+
     }else{
         next(new Error('Invalid post requested!'))
     }

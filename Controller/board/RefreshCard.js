@@ -6,6 +6,7 @@ const User = require('../../models/User');
 const Transaction = require('../../models/Transaction');
 const ConnectedList = require('../../models/ConnectedList');
 const jsonConverterUtils = require('../../utils/JsonConverter');
+const PlayingHistory = require('../../models/PlayingHistory');
 
 
 const handleRefreshMyCard = asyncHandler(async(req, res, next)=>{
@@ -170,10 +171,28 @@ const handleRefreshMyCard = asyncHandler(async(req, res, next)=>{
                                                             try {
                                                                 let resultGetAllConnectedList = await  ConnectedList.findAll({attributes: ['socketId']});
                                                                 if(resultGetAllConnectedList && resultGetAllConnectedList?.length > 0){ 
-                                                                    resultGetAllConnectedList.forEach((info)=>{
-                                                                        io.sockets.in(info.socketId).emit('boardFinish',{roomId: myRoomUpdateResult.roomId, roomInfo: myRoomUpdateResult, playingInfo: newPlaying, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance)})
-                                                                    });
-                                                                    res.json({roomId: myRoomUpdateResult.roomId, roomInfo: myRoomUpdateResult, playingInfo: newPlaying, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance)});
+                                                                    let boardHistory = {
+                                                                        winnerId: winnerPlaying.userId,
+                                                                        members: [],
+                                                                        playingInfo: newPlaying
+                                                                    }
+                                                                    newPlaying.forEach((info)=>{
+                                                                        boardHistory.members.push(info.userId);
+                                                                    })
+                                                                    try {
+                                                                        let playingHistoryResult = await PlayingHistory.create(boardHistory);
+                                                                        if(playingHistoryResult && playingHistoryResult.id){
+
+                                                                        }else{
+                                                                            next(new Error('Playing history updated fail!'))
+                                                                        }
+                                                                    } catch (error) {
+                                                                        next(new Error(error.message))
+                                                                    }
+                                                                    // resultGetAllConnectedList.forEach((info)=>{
+                                                                    //     io.sockets.in(info.socketId).emit('boardFinish',{roomId: myRoomUpdateResult.roomId, roomInfo: myRoomUpdateResult, playingInfo: newPlaying, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance)})
+                                                                    // });
+                                                                    // res.json({roomId: myRoomUpdateResult.roomId, roomInfo: myRoomUpdateResult, playingInfo: newPlaying, userId: winnerPlaying.userId, amount: Number(myRoomResult.currentBalance)});
                                                                 }else{
                                                                     next(new Error('Internal server error!'))
                                                                 }

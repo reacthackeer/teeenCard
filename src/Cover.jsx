@@ -203,6 +203,7 @@ const Cover = ({children}) => {
                 }
             });
             socket.on('boardFinish',({roomId, roomInfo, playingInfo, userId: socketUserId, amount})=>{
+                console.log(playingInfo, socketUserId);
                 dispatch(updateSingleWholeBoard({roomId, roomInfo}));
                 dispatch(updateSingleWholeRoom({roomId,roomInfo}));
                 dispatch(roomFinish({playingInfo, roomId}));

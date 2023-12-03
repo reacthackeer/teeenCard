@@ -17,14 +17,13 @@ import { useNavigate } from 'react-router-dom';
 import { updateSystemCurrency } from '../App/features/Home/homeSlice';
 import { useToggleInvitationMutation } from '../App/features/auth/api';
 import { updateUserAuthInfo, userLoggedOut } from '../App/features/auth/authSlice';
-import { useGetAllCurrencyQuery, useToggleCurrencyMutation } from '../App/features/currency/api';
+import { useToggleCurrencyMutation } from '../App/features/currency/api';
 const UserProfilePage = () => {
   const toast = useToast();
   const navigate = useNavigate(); 
   const {name, email, phone, myRef, demoBalance, realBalance, offlineBalance, userId, src, invitation, role, designation, isJail , isDisabled} = useSelector((state)=> state.auth?.auth); 
   const defaultCurrency = useSelector((state)=> state?.home?.currency); 
-  const [provideInfo,{data, isLoading, isError, isSuccess, error}] = useToggleInvitationMutation();
-  const {data: currencyData, isSuccess: currencyIsSuccess, isLoading: currencyIsLoading} = useGetAllCurrencyQuery();
+  const [provideInfo,{data, isLoading, isError, isSuccess, error}] = useToggleInvitationMutation(); 
   const [debounceLoading, setDebounceLoading] = useState(false);
   const dispatch = useDispatch();
   const handleLogOut = () => {

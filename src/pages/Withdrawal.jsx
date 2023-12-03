@@ -6,6 +6,7 @@ import { useGetAllWalletQuery } from '../App/features/wallet/api';
 import { useAddSingleWithdrawalRequestMutation } from '../App/features/withdrawalRequest/api';
 
 const DepositByWallet = () => {
+        const currency = useSelector((state)=> state.home.currency)
         let {data, isSuccess} = useGetAllWalletQuery(); 
         const [selectedWallet, setSelectedWallet] = useState('');
         const [debounceLoading, setDebounceLoading] = useState(false);
@@ -63,14 +64,14 @@ const DepositByWallet = () => {
             e.preventDefault(); 
             setDebounceLoading(()=> false);
             if(selectedIdType && selectedWallet && wallet && amount && reference && authInfo?.userId){
-            if(Number(authInfo.realBalance) > Number(amount) || Number(authInfo.realBalance) === Number(amount)){
+            if(Number(authInfo.realBalance) > Number(amount) / Number(currency.currencyRate) || Number(authInfo.realBalance) === Number(amount) / Number(currency.currencyRate)){
                 let postInfo = {
                     wallet: selectedWallet,
                     idType: selectedIdType,
                     account: wallet,
                     amount,
                     reference,
-                    currency: 'Usd',
+                    currency: currency.name,
                     userId: authInfo.userId
                 }  
                 provideDepositRequestInfo(postInfo);
@@ -137,7 +138,7 @@ const DepositByWallet = () => {
         <Heading fontSize={'2xl'} mt='2' textAlign={'center'}>Withdrawal your founds within 5 minutes</Heading>
         <Text fontSize={'small'}>Copy the user id from your profile and use it as a reference code.</Text>
         <Box> 
-            <Button width={'100%'}>REAL BALANCE {Number(authInfo.realBalance).toFixed(2)} $</Button>
+            <Button width={'100%'}>REAL BALANCE {Number(Number(authInfo.realBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Button>
         </Box>
         <form onSubmit={handleSubmitFirst}>
 
@@ -170,7 +171,7 @@ const DepositByWallet = () => {
             
             {selectedIdType && selectedWallet && getSelectedWalletInfo() && getSelectedWalletCurrency() &&
             <FormControl mt='2'>
-                <FormLabel>how much dollar do you want to withdrawal ?</FormLabel>
+                <FormLabel>how much {currency.name.toUpperCase()} do you want to withdrawal ?</FormLabel>
                 <Input type="number" placeholder='Enter amount' value={amount} onChange={(e) => setAmount(e.target.value)} />
             </FormControl>}
             {  selectedIdType && selectedWallet && getSelectedWalletInfo() && getSelectedWalletCurrency() &&

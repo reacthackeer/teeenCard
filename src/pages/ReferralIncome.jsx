@@ -6,7 +6,7 @@ import { useGetSingleUserReferralIncomeQuery } from '../App/features/transaction
 import LoadingComponent from '../Components/Loading/Loading';
 
 const TransactionPage = () => {
-  
+  const currency = useSelector((state)=> state.home.currency);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [transactions, setTransactions] = useState([]);
@@ -108,7 +108,7 @@ const TransactionPage = () => {
               </VStack>
               <VStack align="stretch">
                   <Text>{transaction.isIn} ({transaction.balanceType})</Text>
-                  <Text>{transaction.amount}</Text> 
+                  <Text>{Number(Number(transaction.amount) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Text> 
               </VStack>
               </HStack>
           ))}

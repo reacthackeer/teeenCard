@@ -7,6 +7,7 @@ import { useBalanceTransferMutation } from '../App/features/auth/api';
 
 const BalanceTransferPage = () => {
   const {realBalance, userId} = useSelector((state)=> state.auth.auth);
+  const currency = useSelector((state)=> state.home.currency);
   const toast = useToast();
   const [ID, setID] = useState('');
   const [amount, setAmount] = useState('');
@@ -21,13 +22,14 @@ const BalanceTransferPage = () => {
     setDebounceLoading(()=> false);
     if(backupPassword !== password){
         if(ID && amount && backupPassword && password && userId){
-            if(Number(amount) <= Number(realBalance)){
+            if(Number(amount) / Number(currency.currencyRate) <= Number(realBalance)){
                 let postInfo = {
                   userId,
                   backupPassword,
                   password,
                   amount: Number(amount),
-                  receiverId: ID
+                  receiverId: ID,
+                  currency: currency.name
                 }
                 provideTransferInfo(postInfo);
             }else{
@@ -100,7 +102,7 @@ const BalanceTransferPage = () => {
       <Heading mb={6} textAlign="center">Transfer your funds with your friends</Heading>
       <VStack spacing={4} align="stretch">
         <Box>
-          <strong>Current Balance:</strong> $ {Number(realBalance).toFixed(2)}
+          <strong>Current Balance:</strong> {Number(Number(realBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}
         </Box>
         <form onSubmit={handleSubmitFirst}>
           <FormControl mt='2'>
@@ -108,7 +110,7 @@ const BalanceTransferPage = () => {
             <Input type="text" placeholder='User ID' value={ID} onChange={(e) => setID(e.target.value)} required/>
           </FormControl>
           <FormControl mt='2'>
-            <FormLabel>How much dollar do you want to transfer?</FormLabel>
+            <FormLabel>How much {currency.name.toUpperCase()} do you want to transfer?</FormLabel>
             <Input type="number" placeholder='Enter amount' value={amount} onChange={(e) => setAmount(e.target.value)} required/>
           </FormControl>
           <FormControl mt='2'>

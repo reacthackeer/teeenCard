@@ -20,6 +20,7 @@ const CreateBoardForm = () => {
   const [provideBoardInfo, {data, isLoading, isSuccess, isError, error}] = useAddSingleBoardMutation();
   const userId = useSelector((state)=> state?.auth?.auth?.userId);
   const [debounceLoading, setDebounceLoading] = useState(false);
+  const currency = useSelector((state)=> state.home.currency);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -38,6 +39,7 @@ const CreateBoardForm = () => {
     minBlindHit: '',
     minChaalHit: '',
     maxPlayer: '',
+    currency: currency.name
   });
 
   
@@ -177,7 +179,7 @@ const CreateBoardForm = () => {
       <Box p={4}>
         <form onSubmit={handleDebounceSubmit}>
           <FormControl>
-            <FormLabel>Name</FormLabel>
+            <FormLabel>Board Name</FormLabel>
             <Input 
               name="name" 
               value={formData.name} 
@@ -188,7 +190,7 @@ const CreateBoardForm = () => {
           </FormControl>
 
           <FormControl mt='2'>
-            <FormLabel>Join</FormLabel>
+            <FormLabel>Required to join ({currency.name.toUpperCase()})</FormLabel>
             <Input
               type="number"
               name="join"
@@ -200,7 +202,7 @@ const CreateBoardForm = () => {
           </FormControl>
 
           <FormControl mt='2'>
-            <FormLabel>Board</FormLabel>
+            <FormLabel>How much ({currency.name.toUpperCase()}) will be board</FormLabel>
             <Input
               type="number"
               name="board"
@@ -212,7 +214,7 @@ const CreateBoardForm = () => {
           </FormControl>
 
           <FormControl mt='2'>
-            <FormLabel>Blind</FormLabel>
+            <FormLabel>How much ({currency.name.toUpperCase()}) will be blind hit</FormLabel>
             <Input
               type="number"
               name="blind"
@@ -224,7 +226,7 @@ const CreateBoardForm = () => {
           </FormControl> 
 
           <FormControl mt='2'>
-            <FormLabel>Chaal</FormLabel>
+            <FormLabel>How much ({currency.name.toUpperCase()}) will be seen/chaal hit</FormLabel>
             <Input
               type="number"
               name="chaal"

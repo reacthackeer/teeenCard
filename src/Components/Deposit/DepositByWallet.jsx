@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, FormLabel, HStack, Input, Select, Text, VStack, useToast } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, HStack, Input, Select, Text, VStack, useToast } from '@chakra-ui/react';
 import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -134,9 +134,6 @@ const DepositByWallet = () => {
         return (
         <VStack spacing={4} align="stretch">
         <Text fontSize={'small'}>Copy the user id from your profile and use it as a reference and send the dollar to our wallet and it will be deposited into your account.</Text>
-        <Box>
-            <strong>Current Balance:</strong> R/$ {authInfo.realBalance} - O/$ ${authInfo.offlineBalance} - D/$ ${authInfo.demoBalance}
-        </Box>
         <form onSubmit={handleSubmitFirst}>
 
             {isSuccess&& data && data?.length > 0 && <FormControl mt='2'>

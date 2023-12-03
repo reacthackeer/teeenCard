@@ -20,6 +20,9 @@ import PlayingCardView from './CardView';
 
 const PlayingRoom = () => {
 
+    const currency = useSelector((state)=> state.home.currency);
+    
+
     const [refreshDebounceLoading, setRefreshDebounceLoading] = useState(false);
     const [leaveDebounceLoading, setLeaveDebounceLoading] = useState(false);
     const [seeCardDebounceLoading, setSeeCardDebounceLoading] = useState(false);
@@ -406,9 +409,9 @@ const PlayingRoom = () => {
                             justify={'space-between'}
                             className='body__my__balanceView'
                         >
-                            <Text>Room B: {Number(room.currentBalance).toFixed(3)} $</Text>
+                            <Text>Room B: {Number(Number(room.currentBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Text>
                             <Link to='/profile'>{room.balanceType.toUpperCase()}</Link>
-                            <Text>My B: {Number(myBalance).toFixed(3)} $</Text>
+                            <Text>My B: {Number(Number(myBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Text>
                         </HStack>
                     </div>
                 </Box>
@@ -427,35 +430,35 @@ const PlayingRoom = () => {
                         >
                         <Button
                             title='Room Balance'
-                        >Room B {Number(room.currentBalance).toFixed(2)} $</Button>
+                        >RB {Number(Number(room.currentBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Button>
                         <Button
                             title='My Balance'
-                        >My B {Number(myBalance).toFixed(2)} $</Button>
+                        >MB {Number(Number(myBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Button>
                             {!seen && !handleCheckIsSideRequired() && 
                                 <Button 
                                     onClick={handleBlindOneExeFirst}
                                     isLoading={blindOneExeIsLoading || blindOneExeDebounceLoading}
-                                >Blind - {Number(room.blind).toFixed(2)} $</Button>
+                                >Blind__{Number(Number(room.blind) * currency.currencyRate).toFixed(1)}</Button>
                             }
                             {!seen && increase === 'true' &&  !handleCheckIsSideRequired() &&
                                 <Button
                                     onClick={handleBlindTwoExeFirst}
                                     isLoading={blindTwoExeIsLoading || blindTwoExeDebounceLoading}
-                                >Blind 2X  - {Number(room.blind).toFixed(2) * 2} $</Button>
+                                >Blind 2X__{Number(Number(room.blind)*2 * currency.currencyRate).toFixed(1)}</Button>
                             }
                             {
                                 seen &&  !handleCheckIsSideRequired() &&
                                 <Button
                                     onClick={handleChaalOneExeFirst}
                                     isLoading={chaalOneExeIsLoading || chaalOneExeDebounceLoading}
-                                >Chaal  - {Number(room.chaal).toFixed(2)} $</Button>
+                                >Chaal__{Number(Number(room.chaal) * currency.currencyRate).toFixed(1)}</Button>
                             }
                             {
                                 seen && increase === 'true' &&  !handleCheckIsSideRequired()&&
                                 <Button
                                     onClick={handleChaalTwoExeFirst}
                                     isLoading={chaalTwoExeIsLoading || chaalTwoExeDebounceLoading}
-                                >Chaal 2X   - {Number(room.chaal).toFixed(2) * 2} $</Button>
+                                >Chaal 2X__{Number(Number(room.chaal) * 2 * currency.currencyRate).toFixed(1)}</Button>
                             }
                             {
                                 seen && SideAbleUser() && 
@@ -463,7 +466,7 @@ const PlayingRoom = () => {
                                     onClick={handleSideCardFirst}
                                     isLoading={sideCardIsLoading || sideCardDebounceLoading}
                                     isDisabled={handleSideAvailable()}
-                                >Side   - {Number(room.blind).toFixed(2) * 1} $</Button>
+                                >Side__{Number(Number(room.blind) * currency.currencyRate).toFixed(1)}</Button>
                             }
                             {
                                 seen && showAbleUser() &&
@@ -471,7 +474,7 @@ const PlayingRoom = () => {
                                     onClick={handleShowCardFirst}
                                     isLoading={showCardIsLoading || showCardDebounceLoading}
                                     isDisabled={handleSideAvailable()}
-                                >Show   - {Number(room.blind).toFixed(2) * 1} $</Button>
+                                >Show__{Number(Number(room.blind) * currency.currencyRate).toFixed(1)}</Button>
                             }
                             <Button
                                 onClick={handleSeeCardFirst}
@@ -497,10 +500,10 @@ const PlayingRoom = () => {
                         >
                             <Button
                                 title='Room Balance'
-                            >Room B {Number(room.currentBalance).toFixed(2)} $</Button>
+                            >RB {Number(Number(room.currentBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Button>
                             <Button
                                 title='My Balance'
-                            >My B {Number(myBalance).toFixed(2)} $</Button> 
+                            >MB {Number(Number(myBalance) * currency.currencyRate).toFixed(1)} {currency.name.toUpperCase()}</Button> 
                             <Button
                                 onClick={handleSeeCardFirst}
                                 isLoading={seeCardIsLoading || seeCardDebounceLoading}

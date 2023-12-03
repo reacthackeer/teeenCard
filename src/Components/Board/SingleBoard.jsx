@@ -102,9 +102,9 @@ const SingleBoard = ({info}) => {
                         <Button>{Number(Number(info.join)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button>
                         <Button>BOARD</Button>
                         <Button>{Number(Number(info.board)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button>
-                        <Button>BLIND</Button>
+                        <Button>BLIND HIT</Button>
                         <Button>{Number(Number(info.blind)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button> 
-                        <Button>CHAAL</Button>
+                        <Button>CHAAL HIT</Button>
                         <Button>{Number(Number(info.chaal)*(Number(defaultCurrency.currencyRate))).toFixed(1)} {defaultCurrency.name.toUpperCase()}</Button> 
                     </Box> 
                 }
@@ -191,7 +191,7 @@ const SingleBoard = ({info}) => {
                                 <Button>RUNNING</Button>
                                 <Button>{info.isStart === 'true' ? "YES" : "NO"}</Button>   
                                 <Button width={'100%'}>Board Type</Button>
-                                <Button width={'100%'}>{info.type}</Button>
+                                <Button width={'100%'}>{info.type.toUpperCase()}</Button>
                                 <Button width={'100%'}>SCHEDULE</Button>
                                 <Button width={'100%'}>{info.isSchedule === 'true' ? "YES": "NO"}</Button>
                                 <Button width={'100%'}>Hit Increasable</Button>

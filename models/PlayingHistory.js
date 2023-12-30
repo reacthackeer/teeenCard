@@ -12,10 +12,19 @@ const PlayingHistory = sequelize.define('playingHistory',{
         type: DataTypes.STRING,  
         allowNull: false
     },
+    name: {
+        type: DataTypes.STRING,  
+        allowNull: true,
+        defaultValue: 'Game'
+    },
+    balanceType: {
+        type: DataTypes.STRING,  
+        allowNull: true,
+        defaultValue: 'demo'
+    },
     members: {
-        type: DataTypes.JSON,
-        allowNull: true,    
-        defaultValue: []
+        type: DataTypes.STRING,
+        allowNull: true
     },  
     playingInfo: {
         type: DataTypes.JSON,

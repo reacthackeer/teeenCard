@@ -55,7 +55,6 @@ const handleAddSingleWithdrawalRequest = asyncHandler(async(req, res, next) => {
         } catch (error) {
             next(new Error(error.message))
         }
-
     }else{
         next(new Error('Invalid post requested!'))
     }

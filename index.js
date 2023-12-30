@@ -66,12 +66,14 @@ const User = require('./models/User');
 const sequelize = require('./config/database');
 const ConnectedList = require('./models/ConnectedList');
 const { withdrawalRequestRouter } = require('./Router/withdrawalRequest');
+const { playingHistory } = require('./Router/playingHistory');
 
 const handleSyncDatabase = async () => {
   try {
     let result = await sequelize.sync({force: false});
     console.log('Successfully database sync');
   } catch (error) { 
+    console.log(error);
     console.log(`Internal server error!`);
   }
 }
@@ -83,6 +85,7 @@ app.use('/api/v1/disconnected', socketDisconnectedRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/coupon', couponRouter);
 app.use('/api/v1/transaction', transactionRouter);
+app.use('/api/v1/playing-history', playingHistory);
 app.use('/api/v1/board', boardRouter);
 app.use('/api/v1/wallet', walletRouter);
 app.use('/api/v1/currency', currencyRouter);
@@ -142,7 +145,6 @@ app.use((err, req, res, next) => {
     }
   });
 });
-
 
 server.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:3000`);

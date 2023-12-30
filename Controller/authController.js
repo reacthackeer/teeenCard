@@ -13,6 +13,7 @@ const { Op } = require('sequelize');
 const InRoom = require('../models/InRoom');
 const jsonConverterUtils = require('../utils/JsonConverter');
 const Board = require('../models/Board');
+const Currency = require('../models/Currency');
 ''
 const handleRegisterUser = asyncHandler(async(req, res, next) => {
     let {name, email, phone, password, referralCode, promoCode, currentBalance, demoBalance, offlineBalance, userId, myRef} = req.body; 
@@ -90,8 +91,7 @@ const handleRegisterUser = asyncHandler(async(req, res, next) => {
                                         }else{
                                             next(new Error('Internal server error!'))
                                         }
-                                    } catch (error) { 
-                                        console.log(error.message);
+                                    } catch (error) {  
                                         next(new Error(error.message))
                                     }
 
@@ -112,8 +112,7 @@ const handleRegisterUser = asyncHandler(async(req, res, next) => {
                 } catch (error) {
                     next(new Error('Internal server Error!'))
                 }
-            } catch (error) {   
-                console.log(error.message);
+            } catch (error) {    
                 next(new Error('Already Email Or Phone Existed!'))
             }
         }else{
@@ -224,8 +223,7 @@ const updateDesignation = asyncHandler(async(req, res, next) => {
             }else{
                 next(new Error("User not founded!"));
             }
-        } catch (error) { 
-            console.log(email, role, designation);
+        } catch (error) {  
             next(new Error('User not founded'))
         }
     }else{
@@ -361,88 +359,100 @@ const handleActiveSingleAccount = asyncHandler(async(req ,res, next)=>{
     }
 });
 const handleUserBalanceTransfer = asyncHandler(async(req ,res, next)=>{
-    let {userId, receiverId, amount, password, backupPassword} = req.body;
+    let {userId, receiverId, amount, password, backupPassword, currency} = req.body;
     if(amount && userId && receiverId && password  && backupPassword){
         try {
             let getSingleUserResult = await User.findOne({where: {userId}});
             if(getSingleUserResult && getSingleUserResult.id){
-                if(Number(getSingleUserResult.realBalance) >= Number(amount) && getSingleUserResult.isDisabled === 'false' && getSingleUserResult.isJail === 'false'){
-                    try {
-                        let receiverResult = await User.findOne({where:{userId:receiverId}});
-                        if(receiverResult && receiverResult.id > 0){
+                try {
+                    let currencyResult = await Currency.findOne({where: {
+                        name: currency
+                    }});
+                    if(currencyResult && currencyResult.id){
+                        let amountConvertToDollar = Number(amount) / Number(currencyResult.currencyRate); 
+                        if(Number(getSingleUserResult.realBalance) >= Number(amountConvertToDollar) && getSingleUserResult.isDisabled === 'false' && getSingleUserResult.isJail === 'false'){
                             try {
-                                let comparePasswordResult = await comparePasswords(backupPassword, getSingleUserResult.password);
-                                if(comparePasswordResult.status__code === 204){
+                                let receiverResult = await User.findOne({where:{userId:receiverId}});
+                                if(receiverResult && receiverResult.id > 0){
                                     try {
-                                        let comparePasswordResult = await comparePasswords(password, getSingleUserResult.password);
-                                        if(comparePasswordResult.status__code === 200){
+                                        let comparePasswordResult = await comparePasswords(backupPassword, getSingleUserResult.password);
+                                        if(comparePasswordResult.status__code === 204){
                                             try {
-                                                let backupPasswordResult = await BackupPassword.findOne({where:{email: getSingleUserResult.email}});
-                                                if(backupPasswordResult && backupPasswordResult.id > 0){
+                                                let comparePasswordResult = await comparePasswords(password, getSingleUserResult.password);
+                                                if(comparePasswordResult.status__code === 200){
                                                     try {
-                                                        let comparePasswordResult = await comparePasswords(backupPassword, backupPasswordResult.password);
-                                                        if(comparePasswordResult.status__code === 200){
-                                                            let transaction = currencyUtils.transferBalanceTransactionGenerator(amount,receiverId,receiverResult.referralCode,userId);
-                                                            try { 
-                                                                let senderUpdate = await User.decrement({realBalance: Number(amount)},{where: {userId}});
-                                                                if(senderUpdate && senderUpdate[0] && senderUpdate[0][1] > 0){
-                                                                    try {
-                                                                        let receiverUpdate = await User.increment({realBalance: Number(transaction.increment)},{where: {userId:receiverId}});
-                                                                        if(receiverUpdate && receiverUpdate[0] && receiverUpdate[0][1] > 0){
+                                                        let backupPasswordResult = await BackupPassword.findOne({where:{email: getSingleUserResult.email}});
+                                                        if(backupPasswordResult && backupPasswordResult.id > 0){
+                                                            try {
+                                                                let comparePasswordResult = await comparePasswords(backupPassword, backupPasswordResult.password);
+                                                                if(comparePasswordResult.status__code === 200){
+                                                                    let transaction = currencyUtils.transferBalanceTransactionGenerator(amountConvertToDollar,receiverId,receiverResult.referralCode,userId);
+                                                                    try { 
+                                                                        let senderUpdate = await User.decrement({realBalance: Number(amountConvertToDollar)},{where: {userId}});
+                                                                        if(senderUpdate && senderUpdate[0] && senderUpdate[0][1] > 0){
                                                                             try {
-                                                                                let transactionCreateResult = await Transaction.bulkCreate(transaction.transactions);
-                                                                                if(transactionCreateResult && transactionCreateResult.length > 0){
-                                                                                    res.json({senderUpdate: {id: 2, userId},receiverUpdate: {id: 3, userId: receiverId}})
+                                                                                let receiverUpdate = await User.increment({realBalance: Number(transaction.increment)},{where: {userId:receiverId}});
+                                                                                if(receiverUpdate && receiverUpdate[0] && receiverUpdate[0][1] > 0){
+                                                                                    try {
+                                                                                        let transactionCreateResult = await Transaction.bulkCreate(transaction.transactions);
+                                                                                        if(transactionCreateResult && transactionCreateResult.length > 0){
+                                                                                            res.json({senderUpdate: {id: 2, userId},receiverUpdate: {id: 3, userId: receiverId}})
+                                                                                        }else{
+                                                                                            next(new Error('Error occurred while creating transfer transaction'))
+                                                                                        }
+                                                                                    } catch (error) {
+                                                                                        next(new Error(error.message))
+                                                                                    }
                                                                                 }else{
-                                                                                    next(new Error('Error occurred while creating transfer transaction'))
+                                                                                    next('Error occurred while increment receiver balance')
                                                                                 }
                                                                             } catch (error) {
                                                                                 next(new Error(error.message))
                                                                             }
                                                                         }else{
-                                                                            next('Error occurred while increment receiver balance')
+                                                                            next('Error occurred while decrement sender balance')
                                                                         }
                                                                     } catch (error) {
                                                                         next(new Error(error.message))
                                                                     }
                                                                 }else{
-                                                                    next('Error occurred while decrement sender balance')
+                                                                    next(new Error('Incorrect old password provided!'));
                                                                 }
                                                             } catch (error) {
-                                                                next(new Error(error.message))
+                                                                next(new Error('Incorrect password password provided!'));
                                                             }
                                                         }else{
-                                                            next(new Error('Incorrect old password provided!'));
+                                                            next(new Error('Backup password not founded!'))
                                                         }
                                                     } catch (error) {
-                                                        next(new Error('Incorrect password password provided!'));
+                                                        next(new Error(error.message))
                                                     }
                                                 }else{
-                                                    next(new Error('Backup password not founded!'))
+                                                    next(new Error('Incorrect old password provided!'));
                                                 }
                                             } catch (error) {
-                                                next(new Error(error.message))
+                                                next(new Error('Incorrect password password provided!'));
                                             }
                                         }else{
-                                            next(new Error('Incorrect old password provided!'));
+                                            next(new Error('Password and backup password must be different!'));
                                         }
                                     } catch (error) {
-                                        next(new Error('Incorrect password password provided!'));
+                                        next(new Error('Please use different password!'));
                                     }
                                 }else{
-                                    next(new Error('Password and backup password must be different!'));
+                                    next(new Error('Receiver User Not founded!'))
                                 }
                             } catch (error) {
-                                next(new Error('Please use different password!'));
+                                next(new Error(error.message))
                             }
                         }else{
-                            next(new Error('Receiver User Not founded!'))
+                            next(new Error('Balance low!'))
                         }
-                    } catch (error) {
-                        next(new Error(error.message))
+                    }else{
+                        next(new Error('Currency not found!'))
                     }
-                }else{
-                    next(new Error('Balance low!'))
+                } catch (error) {
+                    next(new Error(error.message))
                 }
             }else{
                 next(new Error('Internal server  error!'))
@@ -505,8 +515,7 @@ const handleReferralBalanceTransfer = asyncHandler(async(req ,res, next)=>{
                                                     }else{
                                                         next(new Error('You have not any '+balanceType+' balance'));
                                                     }
-                                                } catch (error) {
-                                                    console.log(error.message);
+                                                } catch (error) { 
                                                     next(new Error(error.message))
                                                 }
                                             }else{
@@ -543,7 +552,6 @@ const handleReferralBalanceTransfer = asyncHandler(async(req ,res, next)=>{
         next(new Error(`Invalid server request!`));
     }
 });
-
 const handleResetConnection = asyncHandler(async(req, res, next) => {
     let { userId } = req.params; 
     if (userId) {

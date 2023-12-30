@@ -432,11 +432,13 @@ const handleBlindTwoExe = asyncHandler(async(req, res, next)=>{
                                                                         if(resultGetAllConnectedList && resultGetAllConnectedList?.length > 0){ 
                                                                             let boardHistory = {
                                                                                 winnerId: winnerPlaying.userId,
-                                                                                members: [],
+                                                                                members: '',
+                                                                                name: myRoomUpdateResult.name,
+                                                                                balanceType: myRoomUpdateResult.balanceType,
                                                                                 playingInfo: newPlaying
                                                                             }
                                                                             newPlaying.forEach((info)=>{
-                                                                                boardHistory.members.push(info.userId);
+                                                                                boardHistory.members += `___${info.userId}___`;
                                                                             })
                                                                             try {
                                                                                 let playingHistoryResult = await PlayingHistory.create(boardHistory);
@@ -650,11 +652,13 @@ const handleBlindTwoExe = asyncHandler(async(req, res, next)=>{
                                                                         if(resultGetAllConnectedList && resultGetAllConnectedList?.length > 0){ 
                                                                             let boardHistory = {
                                                                                 winnerId: winnerPlaying.userId,
-                                                                                members: [],
+                                                                                members: '',
+                                                                                name: myRoomUpdateResult.name,
+                                                                                balanceType: myRoomUpdateResult.balanceType,
                                                                                 playingInfo: newPlaying
                                                                             }
                                                                             newPlaying.forEach((info)=>{
-                                                                                boardHistory.members.push(info.userId);
+                                                                                boardHistory.members += `___${info.userId}___`;
                                                                             })
                                                                             try {
                                                                                 let playingHistoryResult = await PlayingHistory.create(boardHistory);

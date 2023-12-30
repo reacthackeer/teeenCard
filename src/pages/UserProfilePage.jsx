@@ -215,6 +215,7 @@ const UserProfilePage = () => {
         <Button display={handleCheckAdmin() ? 'block' : 'none'} onClick={()=>navigate('/admin/update/admin-access')} width={'100%'}>Update admin access</Button>
         <Button display={handleCheckAdmin() ? 'block' : 'none'} onClick={()=>navigate('/admin/update/user-access')} width={'100%'}>Update user access</Button>
         <Button display={handleCheckAdmin() ? 'block' : 'block'} onClick={()=>navigate('/transaction')} width={'100%'}>Transaction History</Button> 
+        <Button display={handleCheckAdmin() ? 'block' : 'block'} onClick={()=>navigate('/playing-history')} width={'100%'}>Playing History</Button> 
         <Button display={handleCheckAdmin() ? 'block' : 'block'} onClick={()=>navigate('/withdrawal')} width={'100%'}>Withdrawal</Button> 
         <Button display={handleCheckAdmin() ? 'block' : 'block'} onClick={()=>navigate('/referral-income')} width={'100%'}>Referral Income</Button> 
         <Button display={handleCheckAdmin() ? 'block' : 'block'} onClick={()=>navigate('/balance-transfer')} width={'100%'}>Balance Transfer</Button>  

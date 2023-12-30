@@ -6,24 +6,13 @@ import { useGetSingleUserTransactionQuery } from '../App/features/transaction/co
 import LoadingComponent from '../Components/Loading/Loading';
 
 const TransactionPage = () => {
-  const currency = useSelector((state)=> state.home.currency);
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const currency = useSelector((state)=> state.home.currency); 
   const [currentPage, setCurrentPage] = useState(1);
   const [transactions, setTransactions] = useState([]);
   const [pages, setPages] = useState(1);
-  const [filter, setFilter] = useState('all');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filter, setFilter] = useState('all'); 
   const navigate = useNavigate();
-  const openModal = (transaction) => {
-    setSelectedTransaction(transaction);
-    setIsModalOpen(true);
-  };
 
-
-  const closeModal = () => {
-    setSelectedTransaction(null);
-    setIsModalOpen(false);
-  };
 
   const filterTransactions = (type) => {
     setFilter(type);
@@ -32,7 +21,7 @@ const TransactionPage = () => {
   const userId = useSelector((state)=> state?.auth?.auth?.userId);
   
  
-  const {data, isLoading, isError, isSuccess,originalArgs} = useGetSingleUserTransactionQuery({userId, page: currentPage},{refetchOnMountOrArgChange: true});
+  const {data, isLoading, isError, isSuccess} = useGetSingleUserTransactionQuery({userId, page: currentPage},{refetchOnMountOrArgChange: true});
 
   const filteredTransactions = () => {
     let result = [];

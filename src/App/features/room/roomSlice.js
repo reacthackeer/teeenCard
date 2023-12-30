@@ -4,7 +4,9 @@ const initialState = {
     roomId: '',
     isFilled: false, 
     boardFinish: false,
-    nameWithCard: []
+    nameWithCard: [],
+    historyWithCard: [],
+    historyLoaded: false,
 }
 
 const roomSlice = createSlice({
@@ -16,6 +18,10 @@ const roomSlice = createSlice({
                 state.boardFinish = true;
                 state.nameWithCard = action.payload.playingInfo
             }
+        },
+        historyUpdate: (state, action) => { 
+                state.historyLoaded = action.payload.loaded;
+                state.historyWithCard = action.payload.playingInfo
         },
         resetRoomFinish: (state, action) => { 
                 state.boardFinish = false;
@@ -260,6 +266,7 @@ const roomSlice = createSlice({
 });
 
 export const {  
+    historyUpdate,
     roomFinish,
     resetRoomFinish,
     updateSingleWholeRoom,

@@ -8,6 +8,7 @@ import { useGetAllReferralIncomeQuery } from '../App/features/currency/api';
 import LoadingComponent from '../Components/Loading/Loading';
 
 const ReferralBalanceTransfer = () => {
+    const currency = useSelector((state)=> state.home.currency);
     const userId = useSelector((state)=> state.auth.auth.userId);
     const [currentSelect, setCurrentSelect] = useState('');
     const {data, isSuccess, isLoading, isError} = useGetAllReferralIncomeQuery(userId);
@@ -118,7 +119,7 @@ const ReferralBalanceTransfer = () => {
                         colorScheme={currentSelect === 'real' ? 'whatsapp' : 'gray'}
                         onClick={()=> setCurrentSelect(()=> 'real')}
                     >REAL BALANCE</Button>
-                    <Button>{Number(data?.realBalance).toFixed(2)} $</Button>
+                    <Button>{Number(Number(data?.realBalance) * currency.currencyRate).toFixed(1)} {currency?.name.toUpperCase()}</Button>
                 </HStack>
                 <HStack
                     mt='2'
@@ -129,7 +130,7 @@ const ReferralBalanceTransfer = () => {
                         colorScheme={currentSelect === 'offline' ? 'whatsapp' : 'gray'}
                         onClick={()=> setCurrentSelect(()=> 'offline')}
                     >OFFLINE BALANCE</Button>
-                    <Button>{Number(data?.offlineBalance).toFixed(2)} $</Button>
+                    <Button>{Number(Number(data?.offlineBalance) * currency.currencyRate).toFixed(1)} {currency?.name.toUpperCase()}</Button>
                 </HStack>
                 <HStack
                     mt='2' 
@@ -140,7 +141,7 @@ const ReferralBalanceTransfer = () => {
                         colorScheme={currentSelect === 'demo' ? 'whatsapp' : 'gray'}
                         onClick={()=> setCurrentSelect(()=> 'demo')}
                     >DEMO BALANCE</Button>
-                    <Button>{Number(data?.demoBalance).toFixed(2)} $</Button>
+                    <Button>{Number(Number(data?.demoBalance) * currency.currencyRate).toFixed(1)} {currency?.name.toUpperCase()}</Button>
                 </HStack> 
                 {
                     currentSelect && 

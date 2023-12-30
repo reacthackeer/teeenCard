@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { updateSystemLanguage } from '../App/features/Home/homeSlice';
 const HomeGame = () => {
     const navigate = useNavigate();
-    const {infos, language} = useSelector((state)=> state.home);
+    const {language} = useSelector((state)=> state.home);
+    const {infos, footerBottom} = useSelector((state)=> state.translate);
     const {isLoggedIn, auth} = useSelector((state)=> state.auth); 
     
     const dispatch = useDispatch();
@@ -76,26 +77,33 @@ const HomeGame = () => {
                     }
                 </Box>
             }
+            {isLoggedIn && 
+                <HStack>
+                    <Button width={'100%'} onClick={()=> handleNavigatePage('/profile')}>{footerBottom.profile[language]}</Button>
+                </HStack>
+            }
+            {
+                !isLoggedIn && 
+                    <HStack> 
+                        <Button width={'100%'} onClick={()=> handleNavigatePage('/login')}>{footerBottom.login[language]}</Button> 
+                    </HStack>
+            }
             <HStack mt='2'>
-                {isLoggedIn ? <Button width={'100%'} onClick={()=> handleNavigatePage('/profile')}>Profile</Button> : 
-                    (
-                        <React.Fragment>
-                            <Button width={'65%'} onClick={()=> handleNavigatePage('/register?999999999999')}>Create New Account</Button>
-                            <Button width={'35%'} onClick={()=> handleNavigatePage('/login')}>Login</Button>
-                        </React.Fragment>
-                    )}
+            {
+                !isLoggedIn && <Button width={'100%'} onClick={()=> handleNavigatePage('/register?999999999999')}>{footerBottom.create[language]}</Button>
+            }
             </HStack>
             {!isInstalled() && supported() && <HStack mt='2'>
-                <Button width={'100%'} onClick={handleDownloadApplication}>Download our application</Button>
+                <Button width={'100%'} onClick={handleDownloadApplication}>{footerBottom.download[language]}</Button>
             </HStack>}
             <HStack mt='2'>
-                <Button width={'65%'} onClick={handleChangeLanguage}>Change Language</Button> <Button width={'35%'}>{language.toUpperCase()}</Button>
+                <Button width={'65%'} onClick={handleChangeLanguage}>{footerBottom.changeLanguage[language]}</Button> <Button width={'35%'}>{language.toUpperCase()}</Button>
             </HStack>
             <HStack mt='2'>
-                <Button width={'100%'} onClick={()=> handleNavigatePage('/video-tutorial')}>Video tutorial</Button>
+                <Button width={'100%'} onClick={()=> handleNavigatePage('/video-tutorial')}>{footerBottom.videoTutorial[language]}</Button>
             </HStack>
             <HStack mt='2'>
-                <Button width={'100%'} onClick={()=> handleNavigatePage('/support-center')}>Support Center</Button>
+                <Button width={'100%'} onClick={()=> handleNavigatePage('/support-center')}>{footerBottom.supportCenter[language]}</Button>
             </HStack>
         </Box>
     );

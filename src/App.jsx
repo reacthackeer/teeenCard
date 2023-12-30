@@ -18,11 +18,13 @@ import Design from "./pages/Design";
 import HomeGame from "./pages/HomeGame";
 import LoginPage from "./pages/Login";
 import MyRoom from "./pages/MyRoom";
+import PlayingHistory from "./pages/PlayingHistory";
 import ProfilePictureUpload from "./pages/ProfilePictureUpload";
 import ReferralBalanceTransfer from "./pages/ReferralBalanceTransfer";
 import ReferralIncome from "./pages/ReferralIncome";
 import RegisterPage from "./pages/Register";
 import ResetConnection from "./pages/ResetConnection";
+import SinglePlayingHistory from "./pages/SinglePlayingHistory";
 import StartEarning from "./pages/StartEarning";
 import SupportCenter from "./pages/SupportCenter";
 import TransactionHistory from "./pages/TransactionHistory";
@@ -72,6 +74,22 @@ const router = createBrowserRouter([
         element: <React.Fragment> 
                         <UserPrivate>
                             <TransactionHistory/> 
+                        </UserPrivate>
+                </React.Fragment>,
+    },
+    {
+        path: "/playing-history",
+        element: <React.Fragment> 
+                        <UserPrivate>
+                            <PlayingHistory/> 
+                        </UserPrivate>
+                </React.Fragment>,
+    },
+    {
+        path: "/playing-history/:playingId",
+        element: <React.Fragment> 
+                        <UserPrivate>
+                            <SinglePlayingHistory/> 
                         </UserPrivate>
                 </React.Fragment>,
     },

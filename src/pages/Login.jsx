@@ -2,13 +2,16 @@ import { Box, Container, Heading, useToast } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
     
 import _ from 'lodash';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginUserMutation } from '../App/features/auth/api';
 import { userLoggedIn } from '../App/features/auth/authSlice';
 import UserLoginForm from '../Components/Register/UserLoginForm';
  
 const LoginPage = () => {
+
+  const {language} = useSelector((state)=> state.home);
+  const {loginPage} = useSelector((state)=> state.translate);
   const toast = useToast();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -88,7 +91,7 @@ const handleDebouncedSubmit = (e) => {
   return (  
         <Container maxW="sm" mt={10}>
             <Heading mb={8} size={'lg'} textAlign="center">
-                Login
+                {loginPage.login[language]}
             </Heading>
     
             <Box>
@@ -101,7 +104,7 @@ const handleDebouncedSubmit = (e) => {
                   setSecondLoading={setSecondLoading}
                 />
                 <Box p={5} display={'flex'} justifyContent={'center'}>
-                    <Link to='/register?999999999999'>Create new account</Link>
+                    <Link to='/register?999999999999'>{loginPage.createField[language]}</Link>
                 </Box>
             </Box> 
 

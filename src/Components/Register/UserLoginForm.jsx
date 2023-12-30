@@ -6,10 +6,12 @@ import {
   Input,
   Stack
 } from '@chakra-ui/react';
+import { useSelector } from 'react-redux';
 
-const UserLoginForm = ({secondLoading, setSecondLoading, formData, setFormData, handleSubmit, isLoading }) => {
+const UserLoginForm = ({secondLoading, formData, setFormData, handleSubmit, isLoading }) => {
 
-  
+    const {language} = useSelector((state)=> state.home);
+  const {loginPage} = useSelector((state)=> state.translate);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -20,32 +22,38 @@ const UserLoginForm = ({secondLoading, setSecondLoading, formData, setFormData, 
       <form onSubmit={handleSubmit}>
         <Stack spacing={4}> 
           <FormControl isRequired>
-            <FormLabel>Email</FormLabel>
+            <FormLabel
+              fontSize={'14'}
+            >{loginPage.emailField[language]}</FormLabel>
             <Input
               type="email"
               name="email"
-              placeholder='Enter your email address'
+              placeholder={loginPage.emailPlace[language]}
               value={formData.email}
               onChange={handleChange}
             />
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel>Phone</FormLabel>
+            <FormLabel
+              fontSize={'14'}
+            >{loginPage.phoneField[language]}</FormLabel>
             <Input
               type="tel"
               name="phone"
-              placeholder='Enter your phone number'
+              placeholder={loginPage.phonePlace[language]}
               value={formData.phone}
               onChange={handleChange}
             />
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel>Password</FormLabel>
+            <FormLabel
+              fontSize={'14'}
+            >{loginPage.passwordField[language]}</FormLabel>
             <Input
               type="password"
-              placeholder='Enter your password'
+              placeholder={loginPage.passwordPlace[language]}
               name="password"
               value={formData.password}
               onChange={handleChange}
@@ -57,7 +65,7 @@ const UserLoginForm = ({secondLoading, setSecondLoading, formData, setFormData, 
             colorScheme="teal" 
             isLoading={isLoading || secondLoading}
           >
-            Log In
+            {loginPage.login[language]}
           </Button>
         </Stack>
       </form>

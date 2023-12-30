@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Button } from '@chakra-ui/react';
 import nuid from 'number-uid';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -270,7 +270,19 @@ const Cover = ({children}) => {
             }); 
         }
     },[socket, socketConnected]);
-
+    const {language} = useSelector((state)=> state.home);
+    const handleChangeLanguage = () => {
+        let newLanguage = language;
+        if(language === 'english'){
+            newLanguage = 'bengali'
+        }else{
+            newLanguage = `english`
+        }
+        if(language){
+            localStorage.setItem('system__language', newLanguage);
+            dispatch(updateSystemLanguage(newLanguage));
+        }
+    }
     return (
 
             <Box className="body__view__upper__main__cover__container">
@@ -285,7 +297,11 @@ const Cover = ({children}) => {
                     </audio>   
                 </Box>
                 <Box boxShadow={`${socketConnected ? '0 0 5px green inset !important' : "0 0 5px red inset !important"}`} className="body__view__main__container" maxW={'500px'}>
-                    <UserCover>
+                    <Button
+                        display={'none'}
+                        onClick={handleChangeLanguage}
+                    >Toggle</Button>
+                    <UserCover> 
                         <ErrorBoundary> 
                             {
                                 children

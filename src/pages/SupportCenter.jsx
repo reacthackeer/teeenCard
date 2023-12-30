@@ -3,7 +3,8 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 const SupportCenter = () => {
-    const {supportCenter, language} = useSelector((state)=> state.home);
+    const {language} = useSelector((state)=> state.home);
+    const {supportCenter} = useSelector((state)=> state.translate);
     
     return (
         <Box p='2'>

@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const VideoTutorial = () => {
-    const {videoTutorial, language} = useSelector((state)=> state.home);
+    const {language} = useSelector((state)=> state.home);
+    const {videoTutorial} = useSelector((state)=> state.translate);
     
     return (
         <Box p='2'>

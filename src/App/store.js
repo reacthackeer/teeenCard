@@ -6,6 +6,7 @@ import boardSlice from './features/board/boardSlice';
 import depositRequest from "./features/depositRequest/depositRequest";
 import roomSlice from './features/room/roomSlice';
 import socketSlice from "./features/socket/socketSlice";
+import translateSlice from "./features/translate/translateSlice";
 import withdrawalRequest from "./features/withdrawalRequest/withdrawalRequest";
 const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
         auth: authSlice,
         board: boardSlice,
         room: roomSlice,
+        translate: translateSlice,
         home: homeSlice,
         socket: socketSlice,
         depositRequest:  depositRequest,
